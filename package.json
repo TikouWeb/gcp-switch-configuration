@@ -5,7 +5,7 @@
   "version": "0.3.0",
   "private": true,
   "publisher": "tikou-web",
-  "icon": "assets/gcp-logo.png",
+  "icon": "media/gcp-logo.png",
   "engines": {
     "vscode": "^1.85.0"
   },
