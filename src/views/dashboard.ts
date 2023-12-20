@@ -28,9 +28,7 @@ export const dashboardView = ({
   );
 
   const stylesUri = webview.asWebviewUri(
-    vscode.Uri.file(
-      path.join(extentionContext.extensionPath, "src/views", "styles.css")
-    )
+    vscode.Uri.joinPath(extensionUri, "media", "styles.css")
   );
 
   const gcpActiveConfig = gcpConfigurations.find(
