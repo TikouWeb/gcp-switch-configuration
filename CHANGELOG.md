@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+## [0.3.0] - 2023-12-21
+
+### Added
+
+- Show ADC.json file after config switch
+- Add ADC.json link to open manually
+
 ## [0.2.0] - 2023-12-20
 
 ### Changed
