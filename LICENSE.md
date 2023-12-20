@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) [2023] [NASSIM MESDOUR]
+Copyright (c) [2023] Nassim MESDOUR
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
