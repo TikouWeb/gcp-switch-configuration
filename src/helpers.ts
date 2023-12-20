@@ -1,9 +1,9 @@
-import vscode from "vscode";
 import { exec } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { APPLICATION_DEFAULT_CREDENTIAL, GCP_CONFIGURATION } from "./model";
+import { APPLICATION_DEFAULT_CREDENTIAL, GCP_CONFIGURATION } from "./types";
+import { ADC_FILE_PATH } from "./constants";
 
 export const activateConfig = async ({ gcpConfig }: any) => {
   return new Promise((resolve, reject) => {
@@ -47,26 +47,18 @@ export const setAccount = async ({ gcpConfig }: any) => {
 
 export const setADC = async () => {
   return new Promise<APPLICATION_DEFAULT_CREDENTIAL>((resolve, reject) => {
-    exec(`gcloud auth application-default login`, (error, stdout, stderr) => {
+    exec(`gcloud auth application-default login`, (error, _, stderr) => {
       if (error) {
-        console.error(`Execution error: ${error}`);
         reject(false);
         return;
       }
 
       if (stderr) {
-        // Matches application_default_credentials.json inside brackets
-        const regex = /\[([^\]]+)\]/;
-        const matches = stderr.match(regex);
-
-        if (matches && matches[1]) {
-          const jsonData: APPLICATION_DEFAULT_CREDENTIAL = readJsonFile(
-            matches[1]
-          );
-          if (jsonData) {
-            resolve(jsonData);
-            return;
-          }
+        const jsonData: APPLICATION_DEFAULT_CREDENTIAL =
+          readJsonFile(ADC_FILE_PATH);
+        if (jsonData) {
+          resolve(jsonData);
+          return;
         }
 
         reject(stderr);
@@ -79,11 +71,12 @@ export const setADC = async () => {
 };
 
 export const readJsonFile = (filePath: string) => {
-  if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath, "utf8");
+  const absoluteFilePath = path.join(os.homedir(), filePath);
+  if (fs.existsSync(absoluteFilePath)) {
+    const data = fs.readFileSync(absoluteFilePath, "utf8");
     return JSON.parse(data);
   } else {
-    console.error("File does not exist:", filePath);
+    console.error("File does not exist:", absoluteFilePath);
     return null;
   }
 };
@@ -106,6 +99,9 @@ export const updateJsonFile = (
 
 export const configNameToTitle = (configName = "") =>
   configName.replaceAll("-", " ");
+
+export const createAbsolutePath = (relativePath: string) =>
+  path.join(os.homedir(), relativePath);
 
 export const getGcpConfigurations = async () => {
   return new Promise<GCP_CONFIGURATION[]>((resolve, reject) => {
