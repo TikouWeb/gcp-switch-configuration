@@ -7,18 +7,19 @@ import {
   setAccount,
   setADC,
   updateJsonFile,
+  createAbsolutePath,
 } from "./helpers";
 import {
   APP_NAME,
   GCP_SWITCH_COMMAND,
-  APPLICATION_DEFAULT_CREDENTIALS_FILE_PATH,
+  ADC_FILE_PATH,
   CACHE_VERSION,
 } from "./constants";
 import {
   APPLICATION_DEFAULT_CREDENTIAL,
   GCP_CONFIGURATION,
   GLOBAL_CACHE,
-} from "./model";
+} from "./types";
 import { dashboardView } from "./views/dashboard";
 
 let webViewPanel: vscode.WebviewPanel;
@@ -38,6 +39,8 @@ export const activate = async (extentionContext: vscode.ExtensionContext) => {
         vscode.ViewColumn.One,
         {
           enableScripts: true,
+          retainContextWhenHidden: true,
+          enableCommandUris: true,
         }
       );
 
@@ -47,6 +50,7 @@ export const activate = async (extentionContext: vscode.ExtensionContext) => {
       };
 
       webViewPanel.webview.html = dashboardView({
+        extentionContext,
         webview: webViewPanel.webview,
         extensionUri: extentionContext.extensionUri,
         gcpConfigurations:
@@ -54,13 +58,20 @@ export const activate = async (extentionContext: vscode.ExtensionContext) => {
       });
 
       webViewPanel.webview.onDidReceiveMessage(
-        async ({ gcpConfigIndex }) => {
-          const gcpConfig =
-            globalCache(extentionContext).get("GCP_CONFIGURATIONS")[
-              gcpConfigIndex
-            ];
+        async ({ gcpConfigIndex, command }) => {
+          if (command === "switch_config") {
+            const gcpConfig =
+              globalCache(extentionContext).get("GCP_CONFIGURATIONS")[
+                gcpConfigIndex
+              ];
+            switchGcpConfig(gcpConfig, extentionContext);
+            return;
+          }
 
-          switchGcpConfig(gcpConfig, extentionContext);
+          if (command === "open_adc_file") {
+            openAdCFile();
+            return;
+          }
         },
         undefined,
         extentionContext.subscriptions
@@ -101,16 +112,18 @@ const switchGcpConfig = (
 
           const ADC = globalCache(extentionContext).getGcpConfigADC(gcpConfig);
           if (ADC) {
-            updateJsonFile(APPLICATION_DEFAULT_CREDENTIALS_FILE_PATH, ADC);
+            updateJsonFile(ADC_FILE_PATH, ADC);
             const gcpConfigurations = await refreshGcpConfigurations(
               extentionContext
             );
             webViewPanel.webview.html = dashboardView({
+              extentionContext,
               webview: webViewPanel.webview,
               extensionUri: globalContext.extensionUri,
               gcpConfigurations,
             });
             vscode.window.showInformationMessage(message);
+            openAdCFile();
             return;
           }
 
@@ -120,11 +133,13 @@ const switchGcpConfig = (
                 extentionContext
               );
               webViewPanel.webview.html = dashboardView({
+                extentionContext,
                 webview: webViewPanel.webview,
                 extensionUri: globalContext.extensionUri,
                 gcpConfigurations,
               });
               vscode.window.showInformationMessage(message);
+              openAdCFile();
               globalCache(extentionContext).addGcpConfigADC(gcpConfig, ADC);
             })
             .catch(vscode.window.showErrorMessage);
@@ -132,6 +147,11 @@ const switchGcpConfig = (
         .catch(vscode.window.showErrorMessage);
     })
     .catch(vscode.window.showErrorMessage);
+};
+
+const openAdCFile = () => {
+  const uri = vscode.Uri.parse(createAbsolutePath(ADC_FILE_PATH));
+  vscode.window.showTextDocument(uri);
 };
 
 const refreshGcpConfigurations = async (
@@ -148,7 +168,7 @@ const refreshGcpConfigurations = async (
   return gcpConfigurations;
 };
 
-const globalCache = <TValue>(extentionContext: vscode.ExtensionContext) => {
+const globalCache = (extentionContext: vscode.ExtensionContext) => {
   const cache = extentionContext.globalState.get<GLOBAL_CACHE>(CACHE_VERSION, {
     ADCs: {},
     GCP_CONFIGURATIONS: [],
