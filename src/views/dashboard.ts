@@ -2,7 +2,7 @@ import vscode from "vscode";
 import { GCP_CONFIGURATION } from "../types";
 import { configNameToTitle } from "../helpers";
 import { gcpConfigCard } from "./components/gcp-config-card";
-import path from "path";
+import { loadingSpinner } from "./components/loading-spinner";
 
 type DashboardProps = {
   extentionContext: vscode.ExtensionContext;
@@ -12,7 +12,7 @@ type DashboardProps = {
 };
 
 export const dashboardView = ({
-  extentionContext,
+  // extentionContext,
   gcpConfigurations,
   webview,
   extensionUri,
@@ -28,7 +28,7 @@ export const dashboardView = ({
   );
 
   const stylesUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "media", "styles.css")
+    vscode.Uri.joinPath(extensionUri, "assets", "styles.css")
   );
 
   const gcpActiveConfig = gcpConfigurations.find(
@@ -50,14 +50,20 @@ export const dashboardView = ({
               </head>
               <body>
                   <div class="header">
-                      <div style="display: flex; justify-content: flex-start; align-items: center; gap: 1.5em"> 
-                          <img src="https://avatars.githubusercontent.com/u/2810941?s=280&v=4" width="40"/>
-                          <h1 style="margin: 0;">GCP Configuration Switch</h1>
-                      </div>
-                      <div style="display: flex; justify-content: flex-start; align-items: center; gap: 1em">
+                      <div id="header-title" style="display: flex; justify-content: flex-start; align-items: center; gap: 3em; flex: 1;"> 
                         <div class="gcp-current-configuration">
-                            <i class="badge"></i> 
-                            <h3>${configNameToTitle(gcpActiveConfig?.name)}</h3>
+                          <i class="badge"></i>
+                          <h2>${configNameToTitle(gcpActiveConfig?.name)}</h2>
+                        </div>
+                      </div>
+                      <div style="flex: 1;">
+                        <input class="search-input" autocomplete="off" type="search" spellcheck="false" tabindex="0" aria-label="Search for configurations" aria-autocomplete="list" placeholder="Search for configurations">
+                      </div>
+                      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 2em; flex: 1;">
+                        <div class="gcp-notification">
+                          <i class='codicon codicon-bell' style="font-size: 24px;"></i>
+                          <div class="gcp-notification-spinner">
+                          </div>
                         </div>
                         <div class="gcp-current-adc">
                           <i class='codicon codicon-key'></i>
@@ -67,20 +73,15 @@ export const dashboardView = ({
                         </div>
                       </div>
                   </div>
-  
-                  <div class="gcp-configurations-container">
-                      ${gcpConfigurations
-                        .map((gcpConfig, gcpConfigIndex) => {
-                          return gcpConfigCard({ gcpConfig, gcpConfigIndex });
-                        })
-                        ?.join("")}
-                  </div>
-  
-                  <div style="left: 0; bottom: 0; width: 100%;"> 
-                      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1em; padding: 8px 12px;"> 
-                          <img src="https://m.media-amazon.com/images/I/61RMA77giZL.jpg" width="30" style="border-radius: 50%;"/>
-                          <h4>For smart and lazy developers</h4>
-                      </div>
+                  
+                  <div style="padding: 0 24px;">
+                    <div class="gcp-configurations-container">
+                        ${gcpConfigurations
+                          .map((gcpConfig, gcpConfigIndex) => {
+                            return gcpConfigCard({ gcpConfig, gcpConfigIndex });
+                          })
+                          ?.join("")}
+                    </div>
                   </div>
   
                   <script>
@@ -91,11 +92,24 @@ export const dashboardView = ({
                             command: "switch_config" 
                           })
                       }
+
                       function handleADCJsonClick() {
                         vscode.postMessage({ 
                           command: "open_adc_file" 
                         })
-                    } 
+                      }
+
+                      // handle message comming from extension
+                      window.addEventListener('message', event => {
+                          const message = event.data; 
+                          
+                          if(message.command === "start_loading"){
+                            const headerTitle = document.getElementsByClassName("gcp-notification-spinner")[0]; 
+                            headerTitle.innerHTML +=  '${loadingSpinner({
+                              size: "large",
+                            })}'
+                          }
+                      }); 
                   </script>
               </body>
           </html>

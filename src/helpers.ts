@@ -118,7 +118,11 @@ export const getGcpConfigurations = async () => {
         }
 
         if (stdout) {
-          resolve(JSON.parse(stdout));
+          let gcpConfigurations = JSON.parse(stdout) as GCP_CONFIGURATION[];
+          gcpConfigurations = gcpConfigurations.sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          resolve(gcpConfigurations);
           return;
         }
 
