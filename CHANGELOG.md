@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+## [1.1.0] - 2023-12-21
+
+### Added
+
+- Show spinner when changing config
+- Enhance card selection UI
+
+### Fixed
+
+- Fix panel iconPath
+
+
 ## [0.3.0] - 2023-12-21
 
 ### Added

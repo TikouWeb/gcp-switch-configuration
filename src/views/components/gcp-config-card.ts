@@ -13,11 +13,13 @@ export const gcpConfigCard = ({
 }: GcpConfigCardProps) => {
   return `
     <div class="gcp-config-card ${gcpConfig.is_active ? "selected" : ""}">
-          ${
-            gcpConfig.is_active
-              ? '<div class="gcp-config-badge"><i class="badge badge-active"></i></div>'
-              : `<input class="gcp-config-badge" type="radio" name="gcpConfig" onclick="handleSwitchProjectClick(this);" value="${gcpConfigIndex}"/>`
-          }
+          <input 
+            class="gcp-config-badge" 
+            type="radio" name="gcpConfig" 
+            onclick="handleSwitchProjectClick(this);" 
+            value="${gcpConfigIndex}" 
+            ${gcpConfig.is_active ? "checked" : ""}
+          />
           <h3 class="gcp-config-title">${configNameToTitle(gcpConfig.name)}</h3>
           <div class="gcp-config-info">
               <div class="gcp-config-info-item">

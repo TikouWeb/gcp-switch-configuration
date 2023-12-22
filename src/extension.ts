@@ -21,6 +21,7 @@ import {
   GLOBAL_CACHE,
 } from "./types";
 import { dashboardView } from "./views/dashboard";
+import path from "path";
 
 let webViewPanel: vscode.WebviewPanel;
 let globalContext: vscode.ExtensionContext;
@@ -41,13 +42,24 @@ export const activate = async (extentionContext: vscode.ExtensionContext) => {
           enableScripts: true,
           retainContextWhenHidden: true,
           enableCommandUris: true,
+          localResourceRoots: [
+            vscode.Uri.file(
+              path.join(extentionContext.extensionPath, "assets")
+            ),
+            vscode.Uri.file(
+              path.join(extentionContext.extensionPath, "node_modules")
+            ),
+          ],
         }
       );
 
-      webViewPanel.iconPath = {
-        dark: vscode.Uri.joinPath(extentionContext.extensionUri, "image.svg"),
-        light: vscode.Uri.joinPath(extentionContext.extensionUri, "image.svg"),
-      };
+      const iconPath = vscode.Uri.joinPath(
+        extentionContext.extensionUri,
+        "assets",
+        "gcp-logo.png"
+      );
+
+      webViewPanel.iconPath = { dark: iconPath, light: iconPath };
 
       webViewPanel.webview.html = dashboardView({
         extentionContext,
@@ -60,6 +72,9 @@ export const activate = async (extentionContext: vscode.ExtensionContext) => {
       webViewPanel.webview.onDidReceiveMessage(
         async ({ gcpConfigIndex, command }) => {
           if (command === "switch_config") {
+            webViewPanel.webview.postMessage({
+              command: "start_loading",
+            });
             const gcpConfig =
               globalCache(extentionContext).get("GCP_CONFIGURATIONS")[
                 gcpConfigIndex
@@ -98,10 +113,6 @@ const switchGcpConfig = (
   gcpConfig: GCP_CONFIGURATION,
   extentionContext: vscode.ExtensionContext
 ) => {
-  vscode.window.showInformationMessage(
-    `Start switching gcp config to: ${configNameToTitle(gcpConfig.name)}`
-  );
-
   activateConfig({ gcpConfig })
     .then(() => {
       setAccount({ gcpConfig })
@@ -123,7 +134,6 @@ const switchGcpConfig = (
               gcpConfigurations,
             });
             vscode.window.showInformationMessage(message);
-            openAdCFile();
             return;
           }
 
@@ -138,8 +148,8 @@ const switchGcpConfig = (
                 extensionUri: globalContext.extensionUri,
                 gcpConfigurations,
               });
+
               vscode.window.showInformationMessage(message);
-              openAdCFile();
               globalCache(extentionContext).addGcpConfigADC(gcpConfig, ADC);
             })
             .catch(vscode.window.showErrorMessage);
