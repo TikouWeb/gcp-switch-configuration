@@ -7,130 +7,118 @@ import {
   setAccount,
   setADC,
   updateJsonFile,
-  createAbsolutePath,
+  createOsAbsolutePath,
+  createWebViewPanel,
+  createConfig,
 } from "./helpers";
 import {
   APP_NAME,
   GCP_SWITCH_COMMAND,
   ADC_FILE_PATH,
   CACHE_VERSION,
+  WEBVIEW_COMMAND,
 } from "./constants";
 import {
+  ACTIVITY,
   APPLICATION_DEFAULT_CREDENTIAL,
   GCP_CONFIGURATION,
   GLOBAL_CACHE,
+  NEW_CONFIG_FORM,
 } from "./types";
+
 import { dashboardView } from "./views/dashboard";
-import path from "path";
+import { newGcpConfigView } from "./views/new-gcp-config";
 
-let webViewPanel: vscode.WebviewPanel;
-let globalContext: vscode.ExtensionContext;
+export const activate = async (extensionContext: vscode.ExtensionContext) => {
+  await refreshGcpConfigurations(extensionContext);
 
-export const activate = async (extentionContext: vscode.ExtensionContext) => {
-  globalContext = extentionContext;
-
-  await refreshGcpConfigurations(extentionContext);
-
-  let disposable = vscode.commands.registerCommand(
-    GCP_SWITCH_COMMAND,
-    function () {
-      webViewPanel = vscode.window.createWebviewPanel(
-        APP_NAME,
-        "GCP Switch Config",
-        vscode.ViewColumn.One,
-        {
-          enableScripts: true,
-          retainContextWhenHidden: true,
-          enableCommandUris: true,
-          localResourceRoots: [
-            vscode.Uri.file(
-              path.join(extentionContext.extensionPath, "assets")
-            ),
-            vscode.Uri.file(
-              path.join(extentionContext.extensionPath, "node_modules")
-            ),
-          ],
-        }
-      );
-
-      const iconPath = vscode.Uri.joinPath(
-        extentionContext.extensionUri,
-        "assets",
-        "gcp-logo.png"
-      );
-
-      webViewPanel.iconPath = { dark: iconPath, light: iconPath };
-
-      webViewPanel.webview.html = dashboardView({
-        extentionContext,
-        webview: webViewPanel.webview,
-        extensionUri: extentionContext.extensionUri,
-        gcpConfigurations:
-          globalCache(extentionContext).get("GCP_CONFIGURATIONS"),
-      });
-
-      webViewPanel.webview.onDidReceiveMessage(
-        async ({ gcpConfigIndex, command }) => {
-          if (command === "switch_config") {
-            webViewPanel.webview.postMessage({
-              command: "start_loading",
-            });
-            const gcpConfig =
-              globalCache(extentionContext).get("GCP_CONFIGURATIONS")[
-                gcpConfigIndex
-              ];
-            switchGcpConfig(gcpConfig, extentionContext);
-            return;
-          }
-
-          if (command === "open_adc_file") {
-            openAdCFile();
-            return;
-          }
-        },
-        undefined,
-        extentionContext.subscriptions
-      );
-    }
+  let disposable = vscode.commands.registerCommand(GCP_SWITCH_COMMAND, () =>
+    openDashboardPanel(extensionContext)
   );
+  extensionContext.subscriptions.push(disposable);
 
+  addStatusBarItem(extensionContext);
+};
+
+export const deactivate = async () => {};
+
+const addStatusBarItem = (extensionContext: vscode.ExtensionContext) => {
   const gcpSwitchStatusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
-    1
+    0
   );
   gcpSwitchStatusBarItem.command = GCP_SWITCH_COMMAND;
   gcpSwitchStatusBarItem.text = `$(cloud) ${APP_NAME}`;
   gcpSwitchStatusBarItem.tooltip = "Switch to another GCP project";
   gcpSwitchStatusBarItem.show();
-  extentionContext.subscriptions.push(gcpSwitchStatusBarItem);
-
-  extentionContext.subscriptions.push(disposable);
+  extensionContext.subscriptions.push(gcpSwitchStatusBarItem);
 };
 
-export const deactivate = async () => {};
+const openDashboardPanel = (extensionContext: vscode.ExtensionContext) => {
+  const dashboardPanel = createWebViewPanel(extensionContext);
+  dashboardPanel.webview.html = dashboardView({
+    extensionContext,
+    panel: dashboardPanel,
+    gcpConfigurations: globalCache(extensionContext).get("GCP_CONFIGURATIONS"),
+  });
+
+  dashboardPanel.webview.onDidReceiveMessage(
+    async ({ gcpConfigIndex, command }) => {
+      if (command === WEBVIEW_COMMAND.switch_config) {
+        dashboardPanel.webview.postMessage({ command: "start_loading" });
+        const gcpConfig =
+          globalCache(extensionContext).get("GCP_CONFIGURATIONS")[
+            gcpConfigIndex
+          ];
+        switchGcpConfig(extensionContext, dashboardPanel, {
+          name: gcpConfig.name,
+          account: gcpConfig.properties.core.account,
+        });
+        return;
+      }
+
+      if (command === WEBVIEW_COMMAND.open_adc_file) {
+        openADCFile();
+        return;
+      }
+
+      if (command === WEBVIEW_COMMAND.open_add_config_panel) {
+        openAddConfigPanel(extensionContext, dashboardPanel);
+        return;
+      }
+    },
+    undefined,
+    extensionContext.subscriptions
+  );
+};
 
 const switchGcpConfig = (
-  gcpConfig: GCP_CONFIGURATION,
-  extentionContext: vscode.ExtensionContext
+  extensionContext: vscode.ExtensionContext,
+  panel: vscode.WebviewPanel,
+  gcpConfig: {
+    name: GCP_CONFIGURATION["name"];
+    account: GCP_CONFIGURATION["properties"]["core"]["account"];
+  }
 ) => {
-  activateConfig({ gcpConfig })
+  activateConfig(gcpConfig.name)
     .then(() => {
-      setAccount({ gcpConfig })
+      setAccount(gcpConfig.account)
         .then(async () => {
           const message = `GCP config switched successfully to: ${configNameToTitle(
             gcpConfig.name
           )}`;
 
-          const ADC = globalCache(extentionContext).getGcpConfigADC(gcpConfig);
+          const ADC = globalCache(extensionContext).getGcpConfigADC(
+            gcpConfig.name
+          );
           if (ADC) {
             updateJsonFile(ADC_FILE_PATH, ADC);
             const gcpConfigurations = await refreshGcpConfigurations(
-              extentionContext
+              extensionContext
             );
-            webViewPanel.webview.html = dashboardView({
-              extentionContext,
-              webview: webViewPanel.webview,
-              extensionUri: globalContext.extensionUri,
+            panel.webview.html = dashboardView({
+              extensionContext,
+              panel,
               gcpConfigurations,
             });
             vscode.window.showInformationMessage(message);
@@ -140,17 +128,19 @@ const switchGcpConfig = (
           setADC()
             .then(async (ADC) => {
               const gcpConfigurations = await refreshGcpConfigurations(
-                extentionContext
+                extensionContext
               );
-              webViewPanel.webview.html = dashboardView({
-                extentionContext,
-                webview: webViewPanel.webview,
-                extensionUri: globalContext.extensionUri,
+              panel.webview.html = dashboardView({
+                extensionContext,
+                panel,
                 gcpConfigurations,
               });
 
               vscode.window.showInformationMessage(message);
-              globalCache(extentionContext).addGcpConfigADC(gcpConfig, ADC);
+              globalCache(extensionContext).addGcpConfigADC(
+                gcpConfig.name,
+                ADC
+              );
             })
             .catch(vscode.window.showErrorMessage);
         })
@@ -159,13 +149,53 @@ const switchGcpConfig = (
     .catch(vscode.window.showErrorMessage);
 };
 
-const openAdCFile = () => {
-  const uri = vscode.Uri.parse(createAbsolutePath(ADC_FILE_PATH));
+const openADCFile = () => {
+  const uri = vscode.Uri.parse(createOsAbsolutePath(ADC_FILE_PATH));
   vscode.window.showTextDocument(uri);
 };
 
+const openAddConfigPanel = (
+  extensionContext: vscode.ExtensionContext,
+  dashboardPanel: vscode.WebviewPanel
+) => {
+  const panel = createWebViewPanel(extensionContext, vscode.ViewColumn.Beside);
+
+  panel.webview.html = newGcpConfigView({
+    extensionContext,
+    panel,
+    gcpConfigurations: globalCache(extensionContext).get("GCP_CONFIGURATIONS"),
+  });
+
+  panel.webview.onDidReceiveMessage(
+    async ({ command, ...newConfigForm }) => {
+      if (command === WEBVIEW_COMMAND.create_config) {
+        dashboardPanel.webview.postMessage({ command: "start_loading" });
+        createConfig(newConfigForm as NEW_CONFIG_FORM)
+          .then(async (newConfigForm) => {
+            const gcpConfigurations = await refreshGcpConfigurations(
+              extensionContext
+            );
+            const newGcpConfig = gcpConfigurations.find(
+              (gcpConfig) => gcpConfig.name === newConfigForm.configName
+            );
+
+            if (newGcpConfig && newConfigForm.activateConfig) {
+              switchGcpConfig(extensionContext, dashboardPanel, {
+                name: newConfigForm.configName,
+                account: newConfigForm.account,
+              });
+            }
+          })
+          .catch(vscode.window.showErrorMessage);
+      }
+    },
+    undefined,
+    extensionContext.subscriptions
+  );
+};
+
 const refreshGcpConfigurations = async (
-  extentionContext: vscode.ExtensionContext
+  extensionContext: vscode.ExtensionContext
 ) => {
   const gcpConfigurations = await getGcpConfigurations();
 
@@ -173,35 +203,41 @@ const refreshGcpConfigurations = async (
     return [];
   }
 
-  globalCache(extentionContext).setGcpConfigurations(gcpConfigurations);
+  globalCache(extensionContext).setGcpConfigurations(gcpConfigurations);
 
   return gcpConfigurations;
 };
 
-const globalCache = (extentionContext: vscode.ExtensionContext) => {
-  const cache = extentionContext.globalState.get<GLOBAL_CACHE>(CACHE_VERSION, {
+const globalCache = (extensionContext: vscode.ExtensionContext) => {
+  const cache = extensionContext.globalState.get<GLOBAL_CACHE>(CACHE_VERSION, {
     ADCs: {},
     GCP_CONFIGURATIONS: [],
+    ACTIVITIES: [],
   });
 
   return {
     get: <TKey extends keyof GLOBAL_CACHE>(key: TKey): GLOBAL_CACHE[TKey] => {
       return cache[key] as GLOBAL_CACHE[TKey];
     },
-    getGcpConfigADC: (gcpConfig: GCP_CONFIGURATION) => {
-      return cache["ADCs"][gcpConfig.name];
+    getGcpConfigADC: (gcpConfigName: string) => {
+      return cache["ADCs"][gcpConfigName];
     },
     addGcpConfigADC: (
-      gcpConfig: GCP_CONFIGURATION,
+      gcpConfigName: string,
       ADC: APPLICATION_DEFAULT_CREDENTIAL
     ) => {
-      cache["ADCs"][gcpConfig.name] = ADC;
-      extentionContext.globalState.update(CACHE_VERSION, cache);
+      cache["ADCs"][gcpConfigName] = ADC;
+      extensionContext.globalState.update(CACHE_VERSION, cache);
     },
 
     setGcpConfigurations: (gcpConfigurations: GCP_CONFIGURATION[]) => {
       cache["GCP_CONFIGURATIONS"] = gcpConfigurations;
-      extentionContext.globalState.update(CACHE_VERSION, cache);
+      extensionContext.globalState.update(CACHE_VERSION, cache);
+    },
+
+    addActivity: (activity: ACTIVITY) => {
+      cache["ACTIVITIES"].push(activity);
+      extensionContext.globalState.update(CACHE_VERSION, cache);
     },
   };
 };

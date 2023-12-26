@@ -39,7 +39,7 @@ export const gcpConfigCard = ({
                       ${
                         !gcpConfig.properties.core.account ||
                         gcpConfig.properties.core.account === "undefined"
-                          ? `<div class="message-warning"><i class='codicon codicon-warning'></i> Undefined</div>`
+                          ? `<div class="message-warning"><i class='codicon codicon-warning'></i></div>`
                           : `${gcpConfig.properties.core.account}`
                       }
                   </small>

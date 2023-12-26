@@ -32,13 +32,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Change extention repo to open source later
+- Change extension repo to open source later
 - Migrate base code to Typescript
 - Run gcloud script commands with Nodejs instead of vscode terminal
 
 ### Added
 
-- Add ADC cache (Extention global cache)
+- Add ADC cache (extension global cache)
 - Show warning on undefined config Account and projectId
 
 ### Fixed

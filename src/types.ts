@@ -17,7 +17,20 @@ export type GCP_CONFIGURATION = {
   };
 };
 
+export type NEW_CONFIG_FORM = {
+  configName: string;
+  account: string;
+  project: string;
+  activateConfig?: boolean;
+};
+
+export type ACTIVITY = {
+  action: string;
+  date: string;
+};
+
 export type GLOBAL_CACHE = {
   ADCs: Record<GCP_CONFIGURATION["name"], APPLICATION_DEFAULT_CREDENTIAL>;
   GCP_CONFIGURATIONS: GCP_CONFIGURATION[];
+  ACTIVITIES: ACTIVITY[];
 };
