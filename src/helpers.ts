@@ -6,16 +6,15 @@ import path from "path";
 import {
   APPLICATION_DEFAULT_CREDENTIAL,
   GCP_CONFIGURATION,
-  NEW_CONFIG_FORM,
+  GCP_PROJECT,
+  GCP_CONFIG_FORM,
 } from "./types";
 import { ADC_FILE_PATH, APP_NAME } from "./constants";
 
-export const createConfig = async (newConfig: NEW_CONFIG_FORM) => {
-  return new Promise<NEW_CONFIG_FORM>((resolve, reject) => {
+export const createGcpConfig = async (newConfig: GCP_CONFIG_FORM) => {
+  return new Promise<GCP_CONFIG_FORM>((resolve, reject) => {
     exec(
-      `gcloud config configurations create ${newConfig.configName} ${
-        !newConfig.activateConfig ? "--no-activate" : ""
-      }`,
+      `gcloud config configurations create ${newConfig.configName}`,
       (error, _, stderr) => {
         if (error) {
           reject(error);
@@ -27,6 +26,49 @@ export const createConfig = async (newConfig: NEW_CONFIG_FORM) => {
         }
 
         resolve(newConfig);
+      }
+    );
+  });
+};
+
+export const updateGcpConfig = async (
+  oldGcpConfig: GCP_CONFIGURATION,
+  gcpConfigForm: GCP_CONFIG_FORM
+) => {
+  return new Promise<GCP_CONFIG_FORM>((resolve, reject) => {
+    exec(
+      `gcloud config configurations rename ${oldGcpConfig.name} --new-name=${gcpConfigForm.configName}`,
+      (error, _, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (stderr && !stderr.includes(gcpConfigForm.configName)) {
+          reject(false);
+          return;
+        }
+
+        resolve(gcpConfigForm);
+      }
+    );
+  });
+};
+
+export const deleteGcpConfig = async (gcpConfigName: string) => {
+  return new Promise<boolean>((resolve, reject) => {
+    exec(
+      `gcloud config configurations delete ${gcpConfigName} --quiet`,
+      (error, _, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (stderr && !stderr.includes(`Deleted [${gcpConfigName}]`)) {
+          reject(false);
+          return;
+        }
+
+        resolve(true);
       }
     );
   });
@@ -52,11 +94,11 @@ export const activateConfig = async (gcpConfigName: string) => {
   });
 };
 
-export const setAccount = async (gcpConfigAccount: string) => {
+export const setGcpConfigAccount = async (gcpConfigAccount: string) => {
   return new Promise((resolve, reject) => {
     exec(
       `gcloud config set account ${gcpConfigAccount}`,
-      (error, stdout, stderr) => {
+      (error, _, stderr) => {
         if (error) {
           reject(error);
           return;
@@ -72,7 +114,27 @@ export const setAccount = async (gcpConfigAccount: string) => {
   });
 };
 
-export const setADC = async () => {
+export const setGcpConfigProject = async (gcpConfigProject: string) => {
+  return new Promise((resolve, reject) => {
+    exec(
+      `gcloud config set project ${gcpConfigProject}`,
+      (error, _, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (stderr && !stderr.includes("Updated property [core/project]")) {
+          reject(stderr);
+          return;
+        }
+
+        resolve(stderr);
+      }
+    );
+  });
+};
+
+export const setGcpConfigADC = async () => {
   return new Promise<APPLICATION_DEFAULT_CREDENTIAL>((resolve, reject) => {
     exec(`gcloud auth application-default login`, (error, _, stderr) => {
       if (error) {
@@ -124,9 +186,6 @@ export const updateJsonFile = (
   }
 };
 
-export const configNameToTitle = (configName = "") =>
-  configName.replaceAll("-", " ");
-
 export const createOsAbsolutePath = (relativePath: string) =>
   path.join(os.homedir(), relativePath);
 
@@ -134,31 +193,34 @@ export const createExtensionAbsolutePath = (relativePath: string) =>
   path.join(os.homedir(), relativePath);
 
 export const getGcpConfigurations = async () => {
-  return new Promise<GCP_CONFIGURATION[]>((resolve, reject) => {
-    exec(
-      "gcloud config configurations list --format=json",
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Execution error: ${error}`);
-          return;
-        }
-        if (stderr) {
-          console.error(`Error: ${stderr}`);
-          return;
-        }
+  return new Promise<GCP_CONFIGURATION[]>(async (resolve, reject) => {
+    try {
+      const gcpConfigurationsOutput = await executeCommand(
+        `gcloud config configurations list --sort-by=name --format=json`
+      );
+      const gcpConfigurations = JSON.parse(
+        gcpConfigurationsOutput
+      ) as GCP_CONFIGURATION[];
+      resolve(gcpConfigurations);
+    } catch (error) {
+      console.error("Error in getGcpConfigurations:", error);
+      reject(error);
+    }
+  });
+};
 
-        if (stdout) {
-          let gcpConfigurations = JSON.parse(stdout) as GCP_CONFIGURATION[];
-          gcpConfigurations = gcpConfigurations.sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          resolve(gcpConfigurations);
-          return;
-        }
-
-        reject(null);
-      }
-    );
+export const getGcpProjects = async () => {
+  return new Promise<GCP_PROJECT[]>(async (resolve, reject) => {
+    try {
+      const gcpProjectsOutput = await executeCommand(
+        `gcloud projects list --sort-by=projectId --format=json`
+      );
+      const gcpProjects = JSON.parse(gcpProjectsOutput) as GCP_PROJECT[];
+      resolve(gcpProjects);
+    } catch (error) {
+      console.error("Error in getGcpProjects:", error);
+      reject(error);
+    }
   });
 };
 
@@ -220,4 +282,20 @@ export const createWebViewPanel = (
   panel.iconPath = { dark: iconPath, light: iconPath };
 
   return panel;
+};
+
+const executeCommand = (command: string) => {
+  return new Promise<string>((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(`error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        reject(`stderr: ${stderr}`);
+        return;
+      }
+      resolve(stdout);
+    });
+  });
 };

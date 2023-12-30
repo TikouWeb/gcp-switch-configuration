@@ -1,4 +1,3 @@
-import { configNameToTitle } from "../../helpers";
 import { GCP_CONFIGURATION } from "../../types";
 
 export const gcpTopbar = (gcpConfigurations: GCP_CONFIGURATION[]) => {
@@ -11,11 +10,11 @@ export const gcpTopbar = (gcpConfigurations: GCP_CONFIGURATION[]) => {
             <div id="header-title" style="display: flex; justify-content: flex-start; align-items: center; gap: 3em; flex: 1;"> 
             <div class="gcp-current-configuration">
                 <i class="badge"></i>
-                <h2>${configNameToTitle(gcpActiveConfig?.name)}</h2>
+                <h2>${gcpActiveConfig?.name}</h2>
             </div>
             </div>
             <div style="flex: 1;">
-            <input class="search-input" autocomplete="off" type="search" spellcheck="false" tabindex="0" aria-label="Search for configurations" aria-autocomplete="list" placeholder="Search for configurations">
+                <input class="search-input" id="search-input" autocomplete="off" type="search" spellcheck="false" aria-label="Search for configurations" placeholder="Search for configurations">
             </div>
             <div style="display: flex; justify-content: flex-end; align-items: center; gap: 2em; flex: 1;">
             <div class="gcp-notification">

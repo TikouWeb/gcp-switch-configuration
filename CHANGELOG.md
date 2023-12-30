@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+## [2.0.0] - 2023-12-30
+
+### Added
+
+- Create, Update and delete configurations.
+- Autocomplete projects list in the gcp form.
+- Add validations for the gcp form.
+- Search for configurations by name, projectId and account.
+
+### Changed
+
+- Enhance Readme introduction toi the extension
+
 ## [1.1.0] - 2023-12-21
 
 ### Added
@@ -19,7 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix panel iconPath
-
 
 ## [0.3.0] - 2023-12-21
 

@@ -3,7 +3,7 @@ import { GCP_CONFIGURATION } from "../types";
 import { createHtmlHead } from "../helpers";
 import { gcpConfigCard } from "./components/gcp-config-card";
 import { loadingSpinner } from "./components/loading-spinner";
-import { gcpTopbar } from "./components/gco-topbar";
+import { gcpTopbar } from "./components/gcp-topbar";
 
 type DashboardProps = {
   extensionContext: vscode.ExtensionContext;
@@ -31,22 +31,36 @@ export const dashboardView = ({
                   </div>
                   
                   <div style="padding: 0 24px;">
-                    <div class="gcp-configurations-container">
+                    <div class="gcp-configurations-container" id="gcp-configurations-list">
                         ${gcpConfigurations
                           .map((gcpConfig, gcpConfigIndex) => {
                             return gcpConfigCard({ gcpConfig, gcpConfigIndex });
                           })
-                          ?.join("")}
+                          .join("")}
                     </div>
                   </div>
   
                   <script>
                       const vscode = acquireVsCodeApi();
-                      function handleSwitchProjectClick(radio) {
+                      function handleSwitchConfigClick(radio) {
                           vscode.postMessage({ 
                             gcpConfigIndex: radio.value, 
                             command: "switch_config" 
                           })
+                      }
+
+                      function handleEditConfigClick(gcpConfigIndex) {
+                        vscode.postMessage({ 
+                          gcpConfigIndex: gcpConfigIndex, 
+                          command: "edit_config" 
+                        })
+                      }
+
+                      function handleDeleteConfigClick(gcpConfigIndex) {
+                        vscode.postMessage({ 
+                          gcpConfigIndex: gcpConfigIndex, 
+                          command: "delete_config" 
+                        })
                       }
 
                       function handleADCJsonClick() {
@@ -72,6 +86,42 @@ export const dashboardView = ({
                             })}'
                           }
                       }); 
+
+                      const searchInput = document.getElementById('search-input');
+
+                      searchInput.addEventListener('input', function() {
+                        const value = this.value?.toLowerCase();
+                        const gcpConfigurationsList = document.getElementById('gcp-configurations-list');
+                        const gcpConfigurations = ${JSON.stringify(
+                          gcpConfigurations
+                        )};
+                        const gcpConfigCardRenderer = ${gcpConfigCard}
+                        gcpConfigurationsList.innerHTML = "";
+                        
+                        if(!value) {
+
+                          gcpConfigurations.forEach((gcpConfig, gcpConfigIndex) => {
+                            gcpConfigurationsList.innerHTML += gcpConfigCardRenderer({ gcpConfig, gcpConfigIndex });
+                          })
+                          return;
+                        }
+
+                        gcpConfigurations.forEach((gcpConfig, gcpConfigIndex) => {
+                          if (
+                            gcpConfig.name?.toLowerCase().includes(value) 
+                            || gcpConfig.properties.core.project?.toLowerCase().includes(value) 
+                            || gcpConfig.properties.core.account?.toLowerCase().includes(value)
+                          ){
+                            
+                            gcpConfigurationsList.innerHTML += gcpConfigCardRenderer({ gcpConfig, gcpConfigIndex });
+                          }
+                        });
+
+                      });
+            
+                      searchInput.addEventListener('focus', function() {
+                        this.dispatchEvent(new Event('input'));
+                      });
                   </script>
               </body>
           </html>

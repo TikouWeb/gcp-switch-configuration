@@ -2,9 +2,12 @@
   "name": "gcp-switch-config",
   "displayName": "GCP Switch Configuration",
   "description": "Switch gcp configuration with one click just like magic ✨",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "private": false,
-  "repository": "https://github.com/TikouWeb/gcp-switch-configuration",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TikouWeb/gcp-switch-configuration.git"
+  },
   "publisher": "tikou-web",
   "icon": "assets/gcp-logo.png",
   "engines": {
