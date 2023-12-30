@@ -19,6 +19,9 @@
 
   --shadow-1: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
+
+  --text-warning-color: #f4c000;
+  --text-error-color: var(--error-color);
 }
 
 body {
@@ -30,7 +33,6 @@ body.vscode-light {
   --text-primary-color: rgba(0, 0, 0, 0.87);
   --text-secondary-color: rgba(0, 0, 0, 0.6);
   --text-disabled-color: rgba(0, 0, 0, 0.38);
-  --text-warning-color: #f4c000;
 
   --bg-paper: #ffffff;
   --bg-default: #ffffff;
@@ -46,7 +48,6 @@ body.vscode-dark {
   --text-primary-color: #ffffff;
   --text-secondary-color: rgba(255, 255, 255, 0.7);
   --text-disabled-color: rgba(255, 255, 255, 0.5);
-  --text-warning-color: #f4c000;
 
   --bg-paper: #141414;
   --bg-default: #141414;
@@ -84,6 +85,31 @@ body.vscode-dark {
   }
 }
 
+.button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--border-radius-medium);
+  font-weight: bold;
+
+  &.button-text {
+    background: transparent;
+    color: var(--text-primary-color);
+
+    &:hover {
+      background: var(--action-hover);
+    }
+  }
+
+  .codicon {
+    font-size: 13px !important;
+  }
+}
+
 .message-warning {
   display: flex;
   align-items: center;
@@ -111,7 +137,7 @@ body.vscode-dark {
 
 .gcp-config-card {
   position: relative;
-  padding: 16px;
+  padding: 12px;
   border-radius: var(--border-radius-medium);
   display: flex;
   flex-direction: column;
@@ -123,6 +149,10 @@ body.vscode-dark {
     background-color: var(--action-hover);
   }
 
+  &:hover .gcp-config-title > .gcp-config-edit-action {
+    display: flex;
+  }
+
   &.selected {
     box-shadow: var(--shadow-1);
     background: var(--action-selected);
@@ -132,39 +162,55 @@ body.vscode-dark {
   .gcp-config-title {
     font-weight: bold;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .gcp-config-edit-action {
+      display: none;
+      gap: 0.25rem;
+
+      .codicon-trash {
+        color: var(--text-error-color);
+      }
+    }
   }
-}
 
-.gcp-config-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-  margin-top: 16px;
-}
-.gcp-config-info-item {
-  display: flex;
-  align-items: center;
-}
-.gcp-config-info-item .title {
-  min-width: 60px;
-  font-weight: 500;
-}
-.gcp-config-info-value {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5em;
-  margin-left: 4px;
-}
+  .gcp-config-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    margin-top: 16px;
+    color: var(--text-secondary-color);
+  }
 
-.gcp-config-card .gcp-config-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background-color: var(--bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .gcp-config-info-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .gcp-config-info-item .title {
+    min-width: 60px;
+    font-weight: 500;
+  }
+
+  .gcp-config-info-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    margin-left: 4px;
+  }
+
+  .gcp-config-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .badge {
@@ -208,6 +254,43 @@ body.vscode-dark {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-medium);
   color: var(--text-primary-color);
+}
+
+.autocomplete-dropdown {
+  display: none;
+  position: absolute;
+  border: none;
+  z-index: var(--z-index-appBar);
+  width: calc(100% - 16px);
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--bg-secondary);
+  top: 70px;
+  padding: 8px;
+  border-radius: var(--border-radius-medium);
+
+  .autocomplete-dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: var(--border-radius-medium);
+
+    &:hover {
+      background-color: var(--action-hover);
+    }
+
+    & > :first-child {
+      color: var(--text-primary-color);
+      font-size: 14px;
+    }
+
+    & > :second-child {
+      font-size: 12px;
+      color: var(--text-secondary-color);
+    }
+  }
 }
 
 .gcp-notification {

@@ -8,7 +8,7 @@ const sizeMap = {
 export const loadingSpinner = ({
   size,
 }: {
-  size: "small" | "medium" | "large";
+  size: "small" | "medium" | "large" | "xlarge";
 }) => {
   return `<i class="codicon codicon-loading gcp-spinner" style="font-size: ${sizeMap[size]};"></i>`;
 };
