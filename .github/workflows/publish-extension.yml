@@ -24,7 +24,8 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
+      - name: Build Extension
+        run: yarn compile
+
       - name: Publish Extension
-        env:
-          VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
-        run: vsce publish -p $VSCODE_MARKETPLACE_TOKEN
+        run: vsce publish -p ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
