@@ -36,6 +36,11 @@ export const updateGcpConfig = async (
   gcpConfigForm: GCP_CONFIG_FORM
 ) => {
   return new Promise<GCP_CONFIG_FORM>((resolve, reject) => {
+    if (oldGcpConfig.name === gcpConfigForm.configName) {
+      resolve(gcpConfigForm);
+      return;
+    }
+
     exec(
       `gcloud config configurations rename ${oldGcpConfig.name} --new-name=${gcpConfigForm.configName}`,
       (error, _, stderr) => {

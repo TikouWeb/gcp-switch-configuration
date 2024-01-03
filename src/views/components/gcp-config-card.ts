@@ -31,7 +31,7 @@ export const gcpConfigCard = ({
           </h3>
           <div class="gcp-config-info">
               <div class="gcp-config-info-item">
-                  <small class="title">Project Id</small>
+                  <small class="title">Project</small>
                   <small class="gcp-config-info-value">
                   ${
                     !gcpConfig.properties.core.project ||
