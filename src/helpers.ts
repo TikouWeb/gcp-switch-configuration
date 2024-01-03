@@ -141,25 +141,37 @@ export const setGcpConfigProject = async (gcpConfigProject: string) => {
 
 export const setGcpConfigADC = async () => {
   return new Promise<APPLICATION_DEFAULT_CREDENTIAL>((resolve, reject) => {
-    exec(`gcloud auth application-default login`, (error, _, stderr) => {
-      if (error) {
-        reject(false);
-        return;
-      }
+    const execInstance = exec(
+      `gcloud auth application-default login`,
+      (error, _, stderr) => {
+        if (error) {
+          reject(false);
+          return;
+        }
 
-      if (stderr) {
-        const jsonData: APPLICATION_DEFAULT_CREDENTIAL =
-          readJsonFile(ADC_FILE_PATH);
-        if (jsonData) {
-          resolve(jsonData);
+        if (stderr) {
+          const jsonData: APPLICATION_DEFAULT_CREDENTIAL =
+            readJsonFile(ADC_FILE_PATH);
+          if (jsonData) {
+            resolve(jsonData);
+            return;
+          }
+
+          reject(stderr);
           return;
         }
 
         reject(stderr);
-        return;
       }
+    );
 
-      reject(stderr);
+    const timeout = setTimeout(() => {
+      execInstance.kill("SIGTERM");
+      reject("Authentication process terminated due to timeout");
+    }, 60000);
+
+    execInstance.on("close", () => {
+      clearTimeout(timeout);
     });
   });
 };

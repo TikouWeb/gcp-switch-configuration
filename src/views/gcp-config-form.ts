@@ -99,13 +99,13 @@ export const gcpConfigFormView = ({
                   <span class="error" id="errorAccount"></span>
               </div>
               <div class="form-group">
-                <label for="project">Select Project:</label>
-                <input type="text" id="project" name="project" autocomplete="off" />
+                <label for="project">Select GCP Project:</label>
+                <input type="text" id="project" name="project" autocomplete="off" placeholder="Search and select a GCP project"/>
                 <div id="autocompleteDropdown" class="autocomplete-dropdown">
                 </div>
                 <span class="error" id="errorProject"></span>
               </div>
-              <button class="button-base button-contained-primary" style="margin: 30px auto 0;" type="submit">
+              <button class="button-base button-contained-secondary" style="margin: 30px auto 0;" type="submit">
                 ${submitButtonText} <i class='codicon codicon-send'></i>
               </button>
             </form>
@@ -132,29 +132,37 @@ export const gcpConfigFormView = ({
                 const value = this.value?.toLowerCase();
                 autocompleteDropdown.innerHTML = ''; // Clear previous options
 
+                const createDropdownItem = (gcpProject) => {
+                  const dropdownItem = document.createElement('div');
+                  dropdownItem.classList.add("autocomplete-dropdown-item");
+
+                  dropdownItem.onclick = function() {
+                    console.log("clicked hello")
+                    projectInput.value = gcpProject.projectId;
+                    autocompleteDropdown.style.display = 'none';
+                  };
+
+                  const primaryText = document.createElement('span');
+                  const secondaryText = document.createElement('span');
+                  primaryText.textContent = gcpProject.projectId;
+                  secondaryText.textContent = gcpProject.name;
+
+                  dropdownItem.appendChild(primaryText);
+                  dropdownItem.appendChild(secondaryText);
+                  return dropdownItem
+                }
+
                 ${JSON.stringify(gcpProjects)}.forEach(gcpProject => {
+                  if(!value) {
+                    autocompleteDropdown.appendChild(createDropdownItem(gcpProject));
+                    return
+                  }
                   if (gcpProject.name?.toLowerCase().includes(value) || gcpProject.projectId?.toLowerCase().includes(value)) {
-                    const dropdownItem = document.createElement('div');
-                    dropdownItem.classList.add("autocomplete-dropdown-item");
-
-                    dropdownItem.onclick = function() {
-                      console.log("clicked hello")
-                      projectInput.value = gcpProject.projectId;
-                      autocompleteDropdown.style.display = 'none';
-                    };
-
-                    const primaryText = document.createElement('span');
-                    const secondaryText = document.createElement('span');
-                    primaryText.textContent = gcpProject.projectId;
-                    secondaryText.textContent = gcpProject.name;
-
-                    dropdownItem.appendChild(primaryText);
-                    dropdownItem.appendChild(secondaryText);
-                    autocompleteDropdown.appendChild(dropdownItem);
+                    autocompleteDropdown.appendChild(createDropdownItem(gcpProject));
                   }
                 });
 
-                autocompleteDropdown.style.display = value ? 'block' : 'none';
+                autocompleteDropdown.style.display = 'block';
             });
 
             // Hide dropdown when clicking outside

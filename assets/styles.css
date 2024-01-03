@@ -401,6 +401,7 @@ input[type="radio"]:focus {
 }
 
 .gcp-spinner {
+  color: var(--secondary-color);
   animation: spin 2s linear infinite;
 }
 
