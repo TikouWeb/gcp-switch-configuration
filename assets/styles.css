@@ -1,6 +1,6 @@
 :root {
-  --primary-color: #3367d6;
-  --secondary-color: #f4b042;
+  --primary-color: #4daafc;
+  --secondary-color: #ffa34d;
   --success-color: #33a853;
   --error-color: #d32f2f;
 
@@ -238,12 +238,24 @@ body.vscode-dark {
 }
 
 .gcp-current-configuration {
-  display: flex;
-  align-items: center;
-  gap: 1em;
+  flex-direction: column;
+  align-items: flex-start;
 
   > h2 {
     margin: 0;
+  }
+
+  > p {
+    display: flex;
+    gap: 0.25rem;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 10px;
+
+    .codicon {
+      font-size: 11px;
+      font-weight: bold;
+    }
   }
 }
 
@@ -330,14 +342,15 @@ input[type="radio"] {
 }
 
 input[type="radio"]::before {
-  content: "";
-  width: 70%;
-  height: 70%;
-  border-radius: var(--border-radius-full);
+  content: "\ebb3"; /* codicon-pass-filled */
   transform: scale(0);
+  color: var(--primary-color);
   transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em var(--form-control-color);
-  background-color: var(--primary-color);
+  font: normal normal normal 25px/1 codicon;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 input[type="radio"]:checked::before {
