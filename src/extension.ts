@@ -158,7 +158,7 @@ const openDashboardPanel = (extensionContext: vscode.ExtensionContext) => {
   );
 };
 
-const switchGcpConfig = (
+const switchGcpConfig = async (
   extensionContext: vscode.ExtensionContext,
   panel: vscode.WebviewPanel,
   gcpConfig: {
@@ -167,55 +167,54 @@ const switchGcpConfig = (
     project: GCP_CONFIGURATION["properties"]["core"]["project"];
   }
 ) => {
-  activateConfig(gcpConfig.name)
-    .then(() => {
-      setGcpConfigAccount(gcpConfig.account)
-        .then(() => {
-          setGcpConfigProject(gcpConfig.project)
-            .then(async () => {
-              const message = `GCP config switched successfully to [${gcpConfig.name}]`;
+  try {
+    await activateConfig(gcpConfig.name);
+    await setGcpConfigAccount(gcpConfig.account);
+    await setGcpConfigProject(gcpConfig.project);
 
-              const ADC = globalCache(extensionContext).getGcpConfigADC(
-                gcpConfig.name
-              );
-              if (ADC) {
-                updateJsonFile(ADC_FILE_PATH, ADC);
-                const gcpConfigurations = await refreshGcpConfigurations(
-                  extensionContext
-                );
-                panel.webview.html = dashboardView({
-                  extensionContext,
-                  panel,
-                  gcpConfigurations,
-                });
-                vscode.window.showInformationMessage(message);
-                return;
-              }
+    const message = `GCP config switched successfully to [${gcpConfig.name}]`;
 
-              setGcpConfigADC()
-                .then(async (ADC) => {
-                  const gcpConfigurations = await refreshGcpConfigurations(
-                    extensionContext
-                  );
-                  panel.webview.html = dashboardView({
-                    extensionContext,
-                    panel,
-                    gcpConfigurations,
-                  });
+    const gcpConfigADC = globalCache(extensionContext).getGcpConfigADC(
+      gcpConfig.name
+    );
 
-                  vscode.window.showInformationMessage(message);
-                  globalCache(extensionContext).addGcpConfigADC(
-                    gcpConfig.name,
-                    ADC
-                  );
-                })
-                .catch(vscode.window.showErrorMessage);
-            })
-            .catch(vscode.window.showErrorMessage);
-        })
-        .catch(vscode.window.showErrorMessage);
-    })
-    .catch(vscode.window.showErrorMessage);
+    if (gcpConfigADC) {
+      updateJsonFile(ADC_FILE_PATH, gcpConfigADC);
+      const gcpConfigurations = await refreshGcpConfigurations(
+        extensionContext
+      );
+      panel.webview.html = dashboardView({
+        extensionContext,
+        panel,
+        gcpConfigurations,
+      });
+      vscode.window.showInformationMessage(message);
+      return;
+    }
+
+    const newGcpConfigADC = await setGcpConfigADC();
+
+    const gcpConfigurations = await refreshGcpConfigurations(extensionContext);
+    panel.webview.html = dashboardView({
+      extensionContext,
+      panel,
+      gcpConfigurations,
+    });
+
+    vscode.window.showInformationMessage(message);
+    globalCache(extensionContext).addGcpConfigADC(
+      gcpConfig.name,
+      newGcpConfigADC
+    );
+  } catch (error: any) {
+    vscode.window.showErrorMessage(error);
+    const gcpConfigurations = await refreshGcpConfigurations(extensionContext);
+    panel.webview.html = dashboardView({
+      extensionContext,
+      panel,
+      gcpConfigurations,
+    });
+  }
 };
 
 const openADCFile = () => {
