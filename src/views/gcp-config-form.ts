@@ -37,7 +37,6 @@ export const gcpConfigFormView = ({
             width: 420px;
             margin: auto auto;
             padding: 20px;
-            height: 100vh;
           }
           
           form {
@@ -47,7 +46,6 @@ export const gcpConfigFormView = ({
             border: 1px solid var(--border-color);
             background-color: var(--bg-paper);
             border-radius: var(--border-radius-medium);
-            box-shadow: var(--shadow-1);
           }
 
           .form-group {

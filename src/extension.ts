@@ -82,11 +82,16 @@ const openDashboardPanel = (extensionContext: vscode.ExtensionContext) => {
 
         dashboardPanel.webview.postMessage({ command: "start_loading" });
 
-        switchGcpConfig(extensionContext, dashboardPanel, {
-          name: gcpConfig.name,
-          account: gcpConfig.properties.core.account,
-          project: gcpConfig.properties.core.project,
-        });
+        switchGcpConfig(
+          extensionContext,
+          dashboardPanel,
+          {
+            name: gcpConfig.name,
+            account: gcpConfig.properties.core.account,
+            project: gcpConfig.properties.core.project,
+          },
+          false
+        );
 
         return;
       }
@@ -165,12 +170,15 @@ const switchGcpConfig = async (
     name: GCP_CONFIGURATION["name"];
     account: GCP_CONFIGURATION["properties"]["core"]["account"];
     project: GCP_CONFIGURATION["properties"]["core"]["project"];
-  }
+  },
+  shouldUpdateGcpConfigProperties = true
 ) => {
   try {
     await activateConfig(gcpConfig.name);
-    await setGcpConfigAccount(gcpConfig.account);
-    await setGcpConfigProject(gcpConfig.project);
+    if (shouldUpdateGcpConfigProperties) {
+      await setGcpConfigAccount(gcpConfig.account);
+      await setGcpConfigProject(gcpConfig.project);
+    }
 
     const message = `GCP config switched successfully to [${gcpConfig.name}]`;
 
