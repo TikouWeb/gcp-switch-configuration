@@ -5,9 +5,20 @@ All notable changes to the "gcp-switch-configuration" extension will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.3] - 2024-01-05
 
-- Initial release
+### Fixed
+
+- Fix configuration rename when name didn't change
+
+### Changed
+
+- Enhance UI and dark/light theme colors
+- speedUP configurations switch
+
+### Added
+
+- Auto publish new extension versions to VsCode marketplace
 
 ## [2.0.0] - 2023-12-30
 

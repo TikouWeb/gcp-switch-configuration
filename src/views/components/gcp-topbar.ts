@@ -9,7 +9,7 @@ export const gcpTopbar = (gcpConfigurations: GCP_CONFIGURATION[]) => {
         <div class="header">
             <div id="header-title" style="display: flex; justify-content: flex-start; align-items: center; gap: 3em; flex: 1;"> 
             <div class="gcp-current-configuration">
-                <p><i class="codicon codicon-check"></i>your active configuration is</p>
+                <p><i class="codicon codicon-pass-filled"></i>Active</p>
                 <h2>${gcpActiveConfig?.name}</h2>
             </div>
             </div>

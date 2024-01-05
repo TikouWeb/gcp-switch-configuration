@@ -1,6 +1,6 @@
 # GCP Switch Configuration
 
-Simplify your Google Cloud Platform (GCP) experience with the "GCP Switch Configuration" VSCode extension. 
+Simplify your Google Cloud Platform (GCP) experience with the "GCP Switch Configuration" VSCode extension.
 
 Seamlessly switch between different GCP configurations with just a few clicks!
 
@@ -38,9 +38,9 @@ OR
 
 From the dashboard, you can **manage** all your gcp configurations.
 
-**Search for configurations** just like is you were using google cloud platform console.
+**Search for configurations** just like if you were using google cloud platform console.
 
-with `ADC.json` link, you Quick access to the `application_default_configuration.json` of the current active configuration.
+with `ADC.json` link, you have Quick access to `application_default_configuration.json` of active configuration.
 
 <img src="assets/screenshots/dashboard.png" alt="gcp form" style="width:600px;" />
 
@@ -52,7 +52,7 @@ Search for project to attach to you configuration with autocomplete input in the
 
 <img src="assets/screenshots/form.png" alt="gcp form" style="width:600px;" />
 
-### Fully Responsive UI with Dark/Ligh mode
+### Fully Responsive UI with Dark/Light mode
 
 <img src="assets/screenshots/responsive.png" alt="gcp form" style="width:600px;" />
 
