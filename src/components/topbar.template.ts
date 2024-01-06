@@ -1,4 +1,4 @@
-import { GCP_CONFIGURATION } from "../../types";
+import { GCP_CONFIGURATION } from "../types";
 
 export const gcpTopbar = (gcpConfigurations: GCP_CONFIGURATION[]) => {
   const gcpActiveConfig = gcpConfigurations.find(
@@ -13,20 +13,20 @@ export const gcpTopbar = (gcpConfigurations: GCP_CONFIGURATION[]) => {
                 <h2>${gcpActiveConfig?.name}</h2>
             </div>
             </div>
-            <div style="flex: 1;">
+            <div class="header-searchbar" style="flex: 1;">
                 <input class="search-input" id="search-input" autocomplete="off" type="search" spellcheck="false" aria-label="Search for configurations" placeholder="Search for configurations">
             </div>
-            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 2em; flex: 1;">
-            <div class="gcp-notification">
-                <i class='codicon codicon-bell' style="font-size: 24px;"></i>
-                <div class="gcp-notification-spinner"></div>
-            </div>
-            <div class="gcp-current-adc">
-                <i class='codicon codicon-key'></i>
-                <a href="#" onclick="handleADCJsonClick()">
-                ADC.json
-                </a>
-            </div>
+            <div class="header-notification">
+                <div class="gcp-notification">
+                    <i class='codicon codicon-bell' style="font-size: 24px;"></i>
+                    <div class="gcp-notification-spinner"></div>
+                </div>
+                <div class="gcp-current-adc">
+                    <i class='codicon codicon-key'></i>
+                    <a href="#" onclick="handleADCJsonClick()">
+                    ADC.json
+                    </a>
+                </div>
             </div>
         </div>
     `;

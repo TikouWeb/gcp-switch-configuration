@@ -1,17 +1,20 @@
 import vscode from "vscode";
-import { createHtmlHead } from "../../helpers";
-import { loadingSpinner } from "./loading-spinner";
+import { loadingSpinner } from "./loading-spinner.template";
+import { htmlHeadTemplate } from "./html-head.template";
 
 type LoadingPageProps = {
   extensionContext: vscode.ExtensionContext;
-  panel: vscode.WebviewPanel;
+  webview: vscode.Webview;
 };
 
-export const loadingPage = ({ extensionContext, panel }: LoadingPageProps) => {
+export const loadingPage = ({
+  extensionContext,
+  webview,
+}: LoadingPageProps) => {
   return `
           <!DOCTYPE html>
           <html lang="en">
-            ${createHtmlHead(extensionContext, panel)}
+            ${htmlHeadTemplate(extensionContext, webview)}
             <style>
                 .loading-container {
                     display: flex;

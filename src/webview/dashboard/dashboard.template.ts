@@ -1,36 +1,37 @@
 import vscode from "vscode";
-import { GCP_CONFIGURATION } from "../types";
-import { createHtmlHead } from "../helpers";
-import { gcpConfigCard } from "./components/gcp-config-card";
-import { loadingSpinner } from "./components/loading-spinner";
-import { gcpTopbar } from "./components/gcp-topbar";
+import { GCP_CONFIGURATION } from "../../types";
 
-type DashboardProps = {
+import { gcpConfigCard } from "../../components/config-card.template";
+import { loadingSpinner } from "../../components/loading-spinner.template";
+import { gcpTopbar } from "../../components/topbar.template";
+import { htmlHeadTemplate } from "../../components/html-head.template";
+
+type DashboardTemplateProps = {
   extensionContext: vscode.ExtensionContext;
   gcpConfigurations: GCP_CONFIGURATION[];
-  panel: vscode.WebviewPanel;
+  webview: vscode.Webview;
 };
 
-export const dashboardView = ({
+export const dashboardTemplate = ({
   extensionContext,
   gcpConfigurations,
-  panel,
-}: DashboardProps) => {
+  webview,
+}: DashboardTemplateProps) => {
   return `
           <!DOCTYPE html>
           <html lang="en">
-            ${createHtmlHead(extensionContext, panel)}
+            ${htmlHeadTemplate(extensionContext, webview)}
               <body>
                   ${gcpTopbar(gcpConfigurations)}
                   <div class="gcp-toolbar">
                     <div>
                       <button class="button-base button-contained-secondary" onclick="handleOpenAddConfigPanelClick()">
-                        <i class='codicon codicon-add'></i> Configuration
+                        <i class='codicon codicon-add'></i> <span>Configuration</span>
                       </button>
                     </div>
                   </div>
                   
-                  <div style="padding: 0 24px;">
+                  <div class="gcp-main">
                     <div class="gcp-configurations-container" id="gcp-configurations-list">
                         ${gcpConfigurations
                           .map((gcpConfig, gcpConfigIndex) => {
