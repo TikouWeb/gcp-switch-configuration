@@ -2,14 +2,14 @@
   "name": "gcp-switch-config",
   "displayName": "GCP Switch Configuration",
   "description": "Switch gcp configuration with one click just like magic ✨",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/TikouWeb/gcp-switch-configuration.git"
   },
   "publisher": "tikou-web",
-  "icon": "assets/gcp-logo.png",
+  "icon": "assets/logo-256.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -24,10 +24,28 @@
   "contributes": {
     "commands": [
       {
-        "command": "gcp-switch-config.open-gcp-switch-config",
-        "title": "GCP Switch"
+        "command": "gcp-switch-config.open-dashboard-webview-panel",
+        "title": "GCP Switch Configuration"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gcp-switch-config-activitybar-container-id",
+          "title": "GCP Switch Config",
+          "icon": "$(cloud)"
+        }
+      ]
+    },
+    "views": {
+      "gcp-switch-config-activitybar-container-id": [
+        {
+          "type": "webview",
+          "id": "gcp-switch-config-webview-id",
+          "name": "GCP Switch Config"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",

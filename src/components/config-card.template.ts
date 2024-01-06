@@ -1,4 +1,4 @@
-import { GCP_CONFIGURATION } from "../../types";
+import { GCP_CONFIGURATION } from "../types";
 
 type GcpConfigCardProps = {
   gcpConfig: GCP_CONFIGURATION;
@@ -18,7 +18,7 @@ export const gcpConfigCard = ({
             value="${gcpConfigIndex}" 
             ${gcpConfig.is_active ? "checked" : ""}
           />
-          <h3 class="gcp-config-title">
+          <h4 class="gcp-config-title">
             ${gcpConfig.name}
             <div class="gcp-config-edit-action">
               <button class="button-icon button-text"  onclick="handleEditConfigClick(${gcpConfigIndex});">
@@ -28,7 +28,7 @@ export const gcpConfigCard = ({
                 <i class='codicon codicon-trash'></i>
               </button>
             </div>
-          </h3>
+          </h4>
           <div class="gcp-config-info">
               <div class="gcp-config-info-item">
                   <small class="title">Project</small>

@@ -1,22 +1,22 @@
 import vscode from "vscode";
-import { GCP_CONFIGURATION, GCP_PROJECT } from "../types";
-import { createHtmlHead } from "../helpers";
+import { GCP_CONFIGURATION, GCP_PROJECT } from "../../types";
+import { htmlHeadTemplate } from "../../components/html-head.template";
 
-type GcpConfigFormViewProps = {
+type configFormTemplateProps = {
   extensionContext: vscode.ExtensionContext;
   gcpConfigurations: GCP_CONFIGURATION[];
   gcpProjects: GCP_PROJECT[];
   gcpConfig?: GCP_CONFIGURATION;
-  panel: vscode.WebviewPanel;
+  webview: vscode.Webview;
 };
 
-export const gcpConfigFormView = ({
+export const configFormTemplate = ({
   extensionContext,
   gcpConfigurations,
   gcpProjects,
   gcpConfig,
-  panel,
-}: GcpConfigFormViewProps) => {
+  webview,
+}: configFormTemplateProps) => {
   const editMode = Boolean(gcpConfig);
 
   let submitButtonText = "Submit new config";
@@ -31,7 +31,7 @@ export const gcpConfigFormView = ({
   return `
     <!DOCTYPE html>
     <html lang="en">
-        ${createHtmlHead(extensionContext, panel)}
+        ${htmlHeadTemplate(extensionContext, webview)}
         <style>
           .form-container {
             width: 420px;
