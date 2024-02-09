@@ -135,7 +135,6 @@ export const configFormTemplate = ({
                   dropdownItem.classList.add("autocomplete-dropdown-item");
 
                   dropdownItem.onclick = function() {
-                    console.log("clicked hello")
                     projectInput.value = gcpProject.projectId;
                     autocompleteDropdown.style.display = 'none';
                   };

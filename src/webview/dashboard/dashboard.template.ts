@@ -93,6 +93,14 @@ export const dashboardTemplate = ({
                               size: "large",
                             })}'
                           }
+                      });
+                      window.addEventListener('message', event => {
+                          const message = event.data; 
+                          
+                          if(message.command === "stop_loading"){
+                            const headerTitle = document.getElementsByClassName("gcp-notification-spinner")[0]; 
+                            headerTitle.innerHTML = ''
+                          }
                       }); 
 
                       const searchInput = document.getElementById('search-input');

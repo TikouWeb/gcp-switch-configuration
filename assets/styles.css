@@ -467,8 +467,17 @@ input[type="radio"]:focus {
     }
 
     .gcp-notification {
-      .codicon {
+      .codicon-bell {
         font-size: 18px !important;
+      }
+
+      .gcp-notification-spinner {
+        left: -6px;
+        top: -6px;
+
+        .codicon-loading {
+          font-size: 30px !important;
+        }
       }
     }
 

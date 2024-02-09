@@ -93,28 +93,29 @@ const renderDashbordWebview = (
       }
 
       if (command === WEBVIEW_COMMAND.clear_adc_cache) {
-        webview.postMessage({ command: "start_loading" });
+        await webview.postMessage({ command: "start_loading" });
 
         const gcpConfig =
           globalCache(extensionContext).get("GCP_CONFIGURATIONS")[
             gcpConfigIndex
           ];
-        globalCache(extensionContext).removeGcpConfigADC(gcpConfig.name);
+        await globalCache(extensionContext).removeGcpConfigADC(gcpConfig.name);
 
-        if (gcpConfig.is_active) {
-          await switchGcpConfig(
-            extensionContext,
-            webview,
-            {
-              name: gcpConfig.name,
-              account: gcpConfig.properties.core.account,
-              project: gcpConfig.properties.core.project,
-            },
-            false
-          );
+        if (!gcpConfig.is_active) {
+          await webview.postMessage({ command: "stop_loading" });
+          return;
         }
 
-        await refreshDashboardTemplate({ extensionContext, webview });
+        await switchGcpConfig(
+          extensionContext,
+          webview,
+          {
+            name: gcpConfig.name,
+            account: gcpConfig.properties.core.account,
+            project: gcpConfig.properties.core.project,
+          },
+          false
+        );
         return;
       }
 
@@ -143,7 +144,9 @@ const renderDashbordWebview = (
               webview.postMessage({ command: "start_loading" });
 
               await deleteGcpConfig(gcpConfig.name);
-              globalCache(extensionContext).removeGcpConfigADC(gcpConfig.name);
+              await globalCache(extensionContext).removeGcpConfigADC(
+                gcpConfig.name
+              );
 
               await refreshDashboardTemplate({ extensionContext, webview });
               vscode.window.showInformationMessage(
@@ -291,7 +294,8 @@ const refreshDashboardTemplate = async ({
     webview,
     gcpConfigurations,
   });
-  return true;
+
+  await webview.postMessage({ command: "stop_loading" });
 };
 
 export { renderDashbordWebview };
