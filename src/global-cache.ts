@@ -37,9 +37,9 @@ const globalCache = (extensionContext: vscode.ExtensionContext) => {
       cache["ADCs"][gcpConfigName] = ADC;
       extensionContext.globalState.update(CACHE_VERSION, cache);
     },
-    removeGcpConfigADC: (gcpConfigName: string) => {
+    removeGcpConfigADC: async (gcpConfigName: string) => {
       delete cache["ADCs"][gcpConfigName];
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      await extensionContext.globalState.update(CACHE_VERSION, cache);
     },
 
     setGcpConfigurations: (gcpConfigurations: GCP_CONFIGURATION[]) => {
