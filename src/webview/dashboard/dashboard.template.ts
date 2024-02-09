@@ -64,6 +64,13 @@ export const dashboardTemplate = ({
                         })
                       }
 
+                      function handleClearAdcCacheClick(gcpConfigIndex) {
+                        vscode.postMessage({ 
+                          gcpConfigIndex: gcpConfigIndex, 
+                          command: "clear_adc_cache" 
+                        })
+                      }
+
                       function handleADCJsonClick() {
                         vscode.postMessage({ 
                           command: "open_adc_file" 

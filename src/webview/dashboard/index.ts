@@ -92,6 +92,32 @@ const renderDashbordWebview = (
         return;
       }
 
+      if (command === WEBVIEW_COMMAND.clear_adc_cache) {
+        webview.postMessage({ command: "start_loading" });
+
+        const gcpConfig =
+          globalCache(extensionContext).get("GCP_CONFIGURATIONS")[
+            gcpConfigIndex
+          ];
+        globalCache(extensionContext).removeGcpConfigADC(gcpConfig.name);
+
+        if (gcpConfig.is_active) {
+          await switchGcpConfig(
+            extensionContext,
+            webview,
+            {
+              name: gcpConfig.name,
+              account: gcpConfig.properties.core.account,
+              project: gcpConfig.properties.core.project,
+            },
+            false
+          );
+        }
+
+        await refreshDashboardTemplate({ extensionContext, webview });
+        return;
+      }
+
       if (command === WEBVIEW_COMMAND.delete_config) {
         const gcpConfig =
           globalCache(extensionContext).get("GCP_CONFIGURATIONS")[
@@ -119,14 +145,7 @@ const renderDashbordWebview = (
               await deleteGcpConfig(gcpConfig.name);
               globalCache(extensionContext).removeGcpConfigADC(gcpConfig.name);
 
-              const gcpConfigurations = await refreshGcpConfigurations(
-                extensionContext
-              );
-              webview.html = dashboardTemplate({
-                extensionContext,
-                webview,
-                gcpConfigurations,
-              });
+              await refreshDashboardTemplate({ extensionContext, webview });
               vscode.window.showInformationMessage(
                 `Successfully deleted [${gcpConfig.name}]`
               );
@@ -168,14 +187,7 @@ const switchGcpConfig = async (
     if (shouldUpdateGcpConfigProperties || !gcpConfigADC) {
       const newGcpConfigADC = await setGcpConfigADC();
 
-      const gcpConfigurations = await refreshGcpConfigurations(
-        extensionContext
-      );
-      webview.html = dashboardTemplate({
-        extensionContext,
-        webview,
-        gcpConfigurations,
-      });
+      await refreshDashboardTemplate({ extensionContext, webview });
 
       vscode.window.showInformationMessage(message);
       globalCache(extensionContext).addGcpConfigADC(
@@ -188,22 +200,12 @@ const switchGcpConfig = async (
 
     // get ADC of current gcpConfig from cache
     updateJsonFile(ADC_FILE_PATH, gcpConfigADC);
-    const gcpConfigurations = await refreshGcpConfigurations(extensionContext);
-    webview.html = dashboardTemplate({
-      extensionContext,
-      webview,
-      gcpConfigurations,
-    });
+    await refreshDashboardTemplate({ extensionContext, webview });
     vscode.window.showInformationMessage(message);
     return;
   } catch (error: any) {
     vscode.window.showErrorMessage(error);
-    const gcpConfigurations = await refreshGcpConfigurations(extensionContext);
-    webview.html = dashboardTemplate({
-      extensionContext,
-      webview,
-      gcpConfigurations,
-    });
+    await refreshDashboardTemplate({ extensionContext, webview });
   }
 };
 
@@ -274,6 +276,22 @@ const openConfigFormPanel = async (
     undefined,
     extensionContext.subscriptions
   );
+};
+
+const refreshDashboardTemplate = async ({
+  extensionContext,
+  webview,
+}: {
+  extensionContext: vscode.ExtensionContext;
+  webview: vscode.Webview;
+}) => {
+  const gcpConfigurations = await refreshGcpConfigurations(extensionContext);
+  webview.html = dashboardTemplate({
+    extensionContext,
+    webview,
+    gcpConfigurations,
+  });
+  return true;
 };
 
 export { renderDashbordWebview };

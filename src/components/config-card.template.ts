@@ -18,17 +18,22 @@ export const gcpConfigCard = ({
             value="${gcpConfigIndex}" 
             ${gcpConfig.is_active ? "checked" : ""}
           />
-          <h4 class="gcp-config-title">
-            ${gcpConfig.name}
+          <div class="gcp-config-card-header">
+            <h4 class="gcp-config-title">
+              ${gcpConfig.name}
+            </h4>
             <div class="gcp-config-edit-action">
-              <button class="button-icon button-text"  onclick="handleEditConfigClick(${gcpConfigIndex});">
+              <button class="button-icon button-text" title="Edit config" onclick="handleEditConfigClick(${gcpConfigIndex});">
                 <i class='codicon codicon-edit'></i>
               </button>
-              <button class="button-icon button-text"  onclick="handleDeleteConfigClick(${gcpConfigIndex});">
+              <button class="button-icon button-text" title="Delete config" onclick="handleDeleteConfigClick(${gcpConfigIndex});">
                 <i class='codicon codicon-trash'></i>
               </button>
+              <button class="button-icon button-text" title="Clear ADC cache" onclick="handleClearAdcCacheClick(${gcpConfigIndex});">
+                <i class='codicon codicon-circle-slash'></i>
+              </button>
             </div>
-          </h4>
+          </div>
           <div class="gcp-config-info">
               <div class="gcp-config-info-item">
                   <small class="title">Project</small>
