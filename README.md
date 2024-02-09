@@ -56,7 +56,7 @@ From the dashboard, you can **manage** all your gcp configurations.
 
 with `ADC.json` link, you have Quick access to `application_default_configuration.json` of active configuration.
 
-<img src="assets/screenshots/dashboard.png" alt="gcp form" style="width:600px;" />
+<img src="assets/screenshots/dashboard-webview.png" alt="gcp form" style="width:700px;" />
 
 ### Configuration form
 
@@ -64,11 +64,22 @@ Manage your configurations with a **simple form**, you can create, update and de
 
 Search for project to attach to you configuration with autocomplete input in the form.
 
-<img src="assets/screenshots/form.png" alt="gcp form" style="width:600px;" />
+<img src="assets/screenshots/form.webp" alt="gcp form" style="width:500px;" />
 
 ### Fully Responsive UI with Dark/Light mode
 
-<img src="assets/screenshots/responsive.png" alt="gcp form" style="width:600px;" />
+<table >
+    <tr>
+        <td><img src="assets/screenshots/responsive.png" alt="gcp form" style="width:600px;" /></td>
+        <td><img src="assets/screenshots/config-card.png" alt="gcp form" style="width:400px;" />
+        <img src="assets/screenshots/config-card-selected.png" alt="gcp form" style="width:400px;" /></td>
+    </tr>
+    <tr>
+        <td><img src="assets/screenshots/responsive-light.png" alt="gcp form" style="width:600px;" /></td>
+        <td><img src="assets/screenshots/config-card-light.png" alt="gcp form" style="width:400px;" />
+        <img src="assets/screenshots/config-card-selected-light.png" alt="gcp form" style="width:400px;" /></td>
+    </tr>
+</table>
 
 Enjoy streamlined GCP project management right within VSCode!
 

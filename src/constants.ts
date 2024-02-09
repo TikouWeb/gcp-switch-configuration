@@ -19,4 +19,5 @@ export const WEBVIEW_COMMAND = {
   open_adc_file: "open_adc_file",
   open_add_config_panel: "open_add_config_panel",
   create_config: "create_config",
+  clear_adc_cache: "clear_adc_cache",
 };
