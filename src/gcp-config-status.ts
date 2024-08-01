@@ -2,7 +2,7 @@ import vscode from "vscode";
 import { OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND } from "./constants";
 
 type State = {
-  configName: string;
+  configName?: string;
 };
 
 type GcpConfigurationStatusBar = {
