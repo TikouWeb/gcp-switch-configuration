@@ -2,7 +2,7 @@ import vscode from "vscode";
 import { OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND } from "./constants";
 
 type State = {
-  configName?: string;
+  configName: string;
 };
 
 type GcpConfigurationStatusBar = {
@@ -19,13 +19,16 @@ const gcpConfigurationStatusBarManager = () => {
     configName: "",
   };
 
-  const text = () => `$(cloud) | $(check)${state.configName}`.slice(0, 15);
+  const text = () => `$(cloud) | $(check)${state.configName?.slice(0, 15)}`;
   const tooltip = () => `Open GCP Config Switch \n Active: ${state.configName}`;
   const pendingText = () => `$(cloud) | $(sync~spin) Switching...`;
+  const updateConfigName = (configName: State["configName"] = "") => {
+    state.configName = configName ?? "";
+  };
 
   const gcpConfigurationStatusBarItem: GcpConfigurationStatusBar = {
-    create: ({ configName } = {}) => {
-      state.configName = configName;
+    create: ({ configName } = state) => {
+      updateConfigName(configName);
 
       statusBarItem = vscode.window.createStatusBarItem(
         vscode.StatusBarAlignment.Left,
@@ -40,8 +43,8 @@ const gcpConfigurationStatusBarManager = () => {
     show: () => {
       statusBarItem.show();
     },
-    update: ({ configName } = {}) => {
-      state.configName = configName;
+    update: ({ configName } = state) => {
+      updateConfigName(configName);
 
       statusBarItem.text = text();
       statusBarItem.tooltip = tooltip();
