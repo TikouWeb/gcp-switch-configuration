@@ -47,6 +47,12 @@ const globalCache = (extensionContext: vscode.ExtensionContext) => {
       extensionContext.globalState.update(CACHE_VERSION, cache);
     },
 
+    getActiveGcpConfiguration: () => {
+      return cache["GCP_CONFIGURATIONS"].find(
+        (gcpConfig) => gcpConfig.is_active
+      );
+    },
+
     setGcpProjects: (gcpProjects: GCP_PROJECT[]) => {
       cache["GCP_PROJECTS"] = gcpProjects;
       extensionContext.globalState.update(CACHE_VERSION, cache);
@@ -97,4 +103,4 @@ const refreshGcpProjects = async (
   return gcpProjects;
 };
 
-export { globalCache, refreshGcpProjects, refreshGcpConfigurations };
+export { globalCache, refreshGcpConfigurations, refreshGcpProjects };
