@@ -29,6 +29,7 @@ import { configFormTemplate } from "./config-form.template";
 import { dashboardTemplate } from "./dashboard.template";
 
 import { loadingPage } from "../../components/loading-page.template";
+import { gcpConfigurationStatusBarItem } from "../../gcp-config-status";
 
 export const openADCFile = () => {
   const uri = vscode.Uri.parse(createOsAbsolutePath(ADC_FILE_PATH));
@@ -58,6 +59,7 @@ const renderDashbordWebview = (
         }
 
         webview.postMessage({ command: "start_loading" });
+        gcpConfigurationStatusBarItem.setPending();
 
         switchGcpConfig(
           extensionContext,
@@ -296,6 +298,14 @@ const refreshDashboardTemplate = async ({
   });
 
   await webview.postMessage({ command: "stop_loading" });
+  gcpConfigurationStatusBarItem.setPending(false);
+
+  const activeGcpConfiguration =
+    globalCache(extensionContext).getActiveGcpConfiguration();
+
+  gcpConfigurationStatusBarItem.update({
+    configName: activeGcpConfiguration?.name,
+  });
 };
 
 export { renderDashbordWebview };
