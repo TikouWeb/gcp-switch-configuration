@@ -1,10 +1,11 @@
 export const APP_NAME = "gcp-switch-config";
 
-// `GCP_SWITCH_COMMAND` should be the same in package.json
+// --------------------------------------------
+// this commands should be the same in package.json
 export const OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND = `${APP_NAME}.open-dashboard-webview-panel`;
-
-// `webviewId` should be the same in package.json
+export const REFRESH_DASHBOARD_WEBVIEW_COMMAND = `${APP_NAME}.refresh-dashboard-webview`;
 export const WEBVIEW_ID = `${APP_NAME}-webview-id`;
+// --------------------------------------------
 
 export const ADC_FILE_PATH =
   ".config/gcloud/application_default_credentials.json";

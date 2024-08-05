@@ -1,26 +1,26 @@
 import vscode from "vscode";
-import { GCP_CONFIGURATION } from "../../types";
+import { GCP_CONFIGURATION } from "../types";
 
-import { gcpConfigCard } from "../../components/config-card.template";
-import { loadingSpinner } from "../../components/loading-spinner.template";
-import { gcpTopbar } from "../../components/topbar.template";
-import { htmlHeadTemplate } from "../../components/html-head.template";
+import { gcpConfigCard } from "../components/config-card.template";
+import { loadingSpinner } from "../components/loading-spinner.template";
+import { gcpTopbar } from "../components/topbar.template";
+import { htmlHeadTemplate } from "../components/html-head.template";
 
 type DashboardTemplateProps = {
-  extensionContext: vscode.ExtensionContext;
+  context: vscode.ExtensionContext;
   gcpConfigurations: GCP_CONFIGURATION[];
   webview: vscode.Webview;
 };
 
 export const dashboardTemplate = ({
-  extensionContext,
+  context,
   gcpConfigurations,
   webview,
 }: DashboardTemplateProps) => {
   return `
           <!DOCTYPE html>
           <html lang="en">
-            ${htmlHeadTemplate(extensionContext, webview)}
+            ${htmlHeadTemplate(context, webview)}
               <body>
                   ${gcpTopbar(gcpConfigurations)}
                   <div class="gcp-toolbar">

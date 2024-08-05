@@ -3,18 +3,15 @@ import { loadingSpinner } from "./loading-spinner.template";
 import { htmlHeadTemplate } from "./html-head.template";
 
 type LoadingPageProps = {
-  extensionContext: vscode.ExtensionContext;
+  context: vscode.ExtensionContext;
   webview: vscode.Webview;
 };
 
-export const loadingPage = ({
-  extensionContext,
-  webview,
-}: LoadingPageProps) => {
+export const loadingPage = ({ context, webview }: LoadingPageProps) => {
   return `
           <!DOCTYPE html>
           <html lang="en">
-            ${htmlHeadTemplate(extensionContext, webview)}
+            ${htmlHeadTemplate(context, webview)}
             <style>
                 .loading-container {
                     display: flex;
