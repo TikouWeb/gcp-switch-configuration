@@ -1,12 +1,12 @@
 import vscode from "vscode";
 
 export const htmlHeadTemplate = (
-  extensionContext: vscode.ExtensionContext,
+  context: vscode.ExtensionContext,
   webview: vscode.Webview
 ) => {
   const codiconsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(
-      extensionContext.extensionUri,
+      context.extensionUri,
       "node_modules",
       "@vscode/codicons",
       "dist",
@@ -15,7 +15,7 @@ export const htmlHeadTemplate = (
   );
 
   const stylesUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionContext.extensionUri, "assets", "styles.css")
+    vscode.Uri.joinPath(context.extensionUri, "assets", "styles.css")
   );
 
   return `

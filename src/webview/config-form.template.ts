@@ -1,9 +1,9 @@
 import vscode from "vscode";
-import { GCP_CONFIGURATION, GCP_PROJECT } from "../../types";
-import { htmlHeadTemplate } from "../../components/html-head.template";
+import { GCP_CONFIGURATION, GCP_PROJECT } from "../types";
+import { htmlHeadTemplate } from "../components/html-head.template";
 
 type configFormTemplateProps = {
-  extensionContext: vscode.ExtensionContext;
+  context: vscode.ExtensionContext;
   gcpConfigurations: GCP_CONFIGURATION[];
   gcpProjects: GCP_PROJECT[];
   gcpConfig?: GCP_CONFIGURATION;
@@ -11,7 +11,7 @@ type configFormTemplateProps = {
 };
 
 export const configFormTemplate = ({
-  extensionContext,
+  context,
   gcpConfigurations,
   gcpProjects,
   gcpConfig,
@@ -31,7 +31,7 @@ export const configFormTemplate = ({
   return `
     <!DOCTYPE html>
     <html lang="en">
-        ${htmlHeadTemplate(extensionContext, webview)}
+        ${htmlHeadTemplate(context, webview)}
         <style>
           .form-container {
             width: 420px;

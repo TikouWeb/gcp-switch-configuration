@@ -1,52 +1,67 @@
 import vscode from "vscode";
 
 import { createWebViewPanel } from "./helpers";
-import { OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND, WEBVIEW_ID } from "./constants";
+import {
+  OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND,
+  REFRESH_DASHBOARD_WEBVIEW_COMMAND,
+  WEBVIEW_ID,
+} from "./constants";
 
 import { globalCache, refreshGcpConfigurations } from "./global-cache";
-import { renderDashbordWebview } from "./webview/dashboard";
-import { gcpConfigurationStatusBarItem } from "./gcp-config-status";
 
-export const activate = async (extensionContext: vscode.ExtensionContext) => {
-  await refreshGcpConfigurations(extensionContext);
-  globalCache(extensionContext).clearUnusedCache();
+import { GcpConfigStatusBarItemManager } from "./gcp-config-status";
+import { WebviewManager } from "./webview/webview-manager";
 
-  const activeGcpConfiguration =
-    globalCache(extensionContext).getActiveGcpConfiguration();
+export const activate = async (context: vscode.ExtensionContext) => {
+  /**
+   * Refresh gcp configurations and clear unused cache
+   * This is necessary to keep the gcp configurations in sync
+   * with the global cache .
+   */
+  await refreshGcpConfigurations(context);
+  globalCache(context).clearUnusedCache();
 
-  extensionContext.subscriptions.push(
-    gcpConfigurationStatusBarItem.create({
-      configName: activeGcpConfiguration?.name,
-    })
-  );
+  /**
+   * Initialize and set up the GcpConfigStatusBarItemManager instance.
+   * This will create a status bar item and associate it with the provided context.
+   * The status bar item will display the active gcp configuration name.
+   * The status bar item will be disposed when the context is disposed.
+   */
+  GcpConfigStatusBarItemManager.getInstance(context).initialize();
+
+  const webviewManager = new WebviewManager(context);
 
   // Create and Register dashboard webview panel command
-  extensionContext.subscriptions.push(
+  context.subscriptions.push(
     vscode.commands.registerCommand(
       OPEN_DASHBOARD_WEBVIEW_PANEL_COMMAND,
       () => {
-        const dashboardPanel = createWebViewPanel(extensionContext);
-        return renderDashbordWebview(extensionContext, dashboardPanel.webview);
+        const dashboardPanel = createWebViewPanel(context);
+        webviewManager.setPanelView(dashboardPanel);
       }
     )
   );
 
   // Create and Register dashboard webview provider for the activity bar
-  extensionContext.subscriptions.push(
+  context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(WEBVIEW_ID, {
       resolveWebviewView(webviewView: vscode.WebviewView) {
-        renderDashbordWebview(extensionContext, webviewView.webview);
-        webviewView.webview.options = {
-          enableScripts: true,
-          enableCommandUris: true,
-          localResourceRoots: [
-            vscode.Uri.joinPath(extensionContext.extensionUri, "assets"),
-            vscode.Uri.joinPath(extensionContext.extensionUri, "node_modules"),
-          ],
-        };
+        webviewManager.setActivityBarView(webviewView);
       },
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(REFRESH_DASHBOARD_WEBVIEW_COMMAND, () => {
+      webviewManager.updateWebviews();
     })
   );
 };
 
-export const deactivate = async () => {};
+export const deactivate = async () => {
+  // Dispose the GcpConfigStatusBarItemManager instance
+  // This will dispose the status bar item associated with the instance.
+  GcpConfigStatusBarItemManager.getInstance(
+    undefined as unknown as vscode.ExtensionContext
+  ).dispose();
+};

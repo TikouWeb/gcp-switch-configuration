@@ -2,7 +2,7 @@
   "name": "gcp-switch-config",
   "displayName": "GCP Switch Configuration",
   "description": "Switch gcp configuration with one click just like magic ✨",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "private": false,
   "repository": {
     "type": "git",
@@ -25,9 +25,23 @@
     "commands": [
       {
         "command": "gcp-switch-config.open-dashboard-webview-panel",
-        "title": "GCP Switch Configuration"
+        "title": "gcp switch config: open dashboard",
+        "icon": "$(cloud)"
+      },
+      {
+        "command": "gcp-switch-config.refresh-dashboard-webview",
+        "title": "gcp switch: Refresh",
+        "icon": "$(refresh)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "gcp-switch-config.refresh-dashboard-webview",
+          "group": "navigation"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {

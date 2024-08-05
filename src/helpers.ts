@@ -1,6 +1,6 @@
 import vscode from "vscode";
 
-import { APP_NAME } from "./constants";
+import { APP_NAME, ADC_FILE_PATH } from "./constants";
 
 import fs from "fs";
 import os from "os";
@@ -37,7 +37,7 @@ export const createOsAbsolutePath = (relativePath: string) =>
   path.join(os.homedir(), relativePath);
 
 export const createWebViewPanel = (
-  extensionContext: vscode.ExtensionContext,
+  context: vscode.ExtensionContext,
   viewColumn: vscode.ViewColumn = vscode.ViewColumn.One
 ) => {
   const panel = vscode.window.createWebviewPanel(
@@ -49,14 +49,14 @@ export const createWebViewPanel = (
       retainContextWhenHidden: true,
       enableCommandUris: true,
       localResourceRoots: [
-        vscode.Uri.joinPath(extensionContext.extensionUri, "assets"),
-        vscode.Uri.joinPath(extensionContext.extensionUri, "node_modules"),
+        vscode.Uri.joinPath(context.extensionUri, "assets"),
+        vscode.Uri.joinPath(context.extensionUri, "node_modules"),
       ],
     }
   );
 
   const iconPath = vscode.Uri.joinPath(
-    extensionContext.extensionUri,
+    context.extensionUri,
     "assets",
     "logo-256.png"
   );
@@ -64,4 +64,9 @@ export const createWebViewPanel = (
   panel.iconPath = { dark: iconPath, light: iconPath };
 
   return panel;
+};
+
+export const openADCFile = () => {
+  const uri = vscode.Uri.parse(createOsAbsolutePath(ADC_FILE_PATH));
+  vscode.window.showTextDocument(uri);
 };

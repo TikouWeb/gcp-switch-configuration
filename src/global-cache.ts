@@ -14,13 +14,15 @@ import {
   getGcpProjects,
 } from "./services/gcloud-services";
 
-const globalCache = (extensionContext: vscode.ExtensionContext) => {
-  const cache = extensionContext.globalState.get<GLOBAL_CACHE>(CACHE_VERSION, {
+const globalCache = (context: vscode.ExtensionContext) => {
+  const cache = context.globalState.get<GLOBAL_CACHE>(CACHE_VERSION, {
     ADCs: {},
     GCP_CONFIGURATIONS: [],
     GCP_PROJECTS: [],
     ACTIVITIES: [],
   });
+
+  console.log(cache);
 
   return {
     get: <TKey extends keyof GLOBAL_CACHE>(key: TKey): GLOBAL_CACHE[TKey] => {
@@ -35,16 +37,16 @@ const globalCache = (extensionContext: vscode.ExtensionContext) => {
       ADC: APPLICATION_DEFAULT_CREDENTIAL
     ) => {
       cache["ADCs"][gcpConfigName] = ADC;
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      context.globalState.update(CACHE_VERSION, cache);
     },
     removeGcpConfigADC: async (gcpConfigName: string) => {
       delete cache["ADCs"][gcpConfigName];
-      await extensionContext.globalState.update(CACHE_VERSION, cache);
+      await context.globalState.update(CACHE_VERSION, cache);
     },
 
     setGcpConfigurations: (gcpConfigurations: GCP_CONFIGURATION[]) => {
       cache["GCP_CONFIGURATIONS"] = gcpConfigurations;
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      context.globalState.update(CACHE_VERSION, cache);
     },
 
     getActiveGcpConfiguration: () => {
@@ -55,12 +57,12 @@ const globalCache = (extensionContext: vscode.ExtensionContext) => {
 
     setGcpProjects: (gcpProjects: GCP_PROJECT[]) => {
       cache["GCP_PROJECTS"] = gcpProjects;
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      context.globalState.update(CACHE_VERSION, cache);
     },
 
     addActivity: (activity: ACTIVITY) => {
       cache["ACTIVITIES"].push(activity);
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      context.globalState.update(CACHE_VERSION, cache);
     },
 
     clearUnusedCache: () => {
@@ -70,35 +72,31 @@ const globalCache = (extensionContext: vscode.ExtensionContext) => {
       });
 
       cache["ADCs"] = newADCs;
-      extensionContext.globalState.update(CACHE_VERSION, cache);
+      context.globalState.update(CACHE_VERSION, cache);
     },
   };
 };
 
-const refreshGcpConfigurations = async (
-  extensionContext: vscode.ExtensionContext
-) => {
+const refreshGcpConfigurations = async (context: vscode.ExtensionContext) => {
   const gcpConfigurations = await getGcpConfigurations();
 
   if (!gcpConfigurations) {
     return [];
   }
 
-  globalCache(extensionContext).setGcpConfigurations(gcpConfigurations);
+  globalCache(context).setGcpConfigurations(gcpConfigurations);
 
   return gcpConfigurations;
 };
 
-const refreshGcpProjects = async (
-  extensionContext: vscode.ExtensionContext
-) => {
+const refreshGcpProjects = async (context: vscode.ExtensionContext) => {
   const gcpProjects = await getGcpProjects();
 
   if (!gcpProjects) {
     return [];
   }
 
-  globalCache(extensionContext).setGcpProjects(gcpProjects);
+  globalCache(context).setGcpProjects(gcpProjects);
 
   return gcpProjects;
 };
