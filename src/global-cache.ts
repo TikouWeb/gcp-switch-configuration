@@ -22,8 +22,6 @@ const globalCache = (context: vscode.ExtensionContext) => {
     ACTIVITIES: [],
   });
 
-  console.log(cache);
-
   return {
     get: <TKey extends keyof GLOBAL_CACHE>(key: TKey): GLOBAL_CACHE[TKey] => {
       return cache[key] as GLOBAL_CACHE[TKey];

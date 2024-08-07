@@ -1,6 +1,11 @@
 import vscode from "vscode";
 
-import { ADC_FILE_PATH, WEBVIEW_COMMAND } from "../constants";
+import {
+  ADC_FILE_PATH,
+  ERROR_MESSAGE,
+  INFO_MESSAGE,
+  WEBVIEW_COMMAND,
+} from "../constants";
 import { GCP_CONFIGURATION, GCP_CONFIG_FORM } from "../types";
 
 import {
@@ -130,7 +135,6 @@ export class WebviewManager {
 
           this.switchGcpConfig(
             context,
-            webview,
             {
               name: gcpConfig.name,
               account: gcpConfig.properties.core.account,
@@ -143,8 +147,6 @@ export class WebviewManager {
         }
 
         if (command === WEBVIEW_COMMAND.open_adc_file) {
-          console.log("open_adc_file");
-
           openADCFile();
           return;
         }
@@ -175,7 +177,6 @@ export class WebviewManager {
 
           await this.switchGcpConfig(
             context,
-            webview,
             {
               name: gcpConfig.name,
               account: gcpConfig.properties.core.account,
@@ -192,14 +193,14 @@ export class WebviewManager {
 
           if (gcpConfig.is_active) {
             vscode.window.showErrorMessage(
-              `Can not delete [${gcpConfig.name}] because is set as active. Switch to another configuration and retry`
+              ERROR_MESSAGE.CONFIG_DELETE_FAILED(gcpConfig.name)
             );
             return;
           }
 
           vscode.window
             .showInformationMessage(
-              `Are you sure you want to delete \n [${gcpConfig.name}] ?`,
+              INFO_MESSAGE.CONFIG_DELETE_CONFIRM(gcpConfig.name),
               { modal: true, detail: "This action is irreversible !" },
               "Yes",
               "No"
@@ -213,7 +214,7 @@ export class WebviewManager {
 
                 await this.updateWebviews();
                 vscode.window.showInformationMessage(
-                  `Successfully deleted [${gcpConfig.name}]`
+                  INFO_MESSAGE.CONFIG_DELETED(gcpConfig.name)
                 );
               }
             });
@@ -227,7 +228,6 @@ export class WebviewManager {
 
   private switchGcpConfig = async (
     context: vscode.ExtensionContext,
-    webview: vscode.Webview,
     gcpConfig: {
       name: GCP_CONFIGURATION["name"];
       account: GCP_CONFIGURATION["properties"]["core"]["account"];
@@ -235,7 +235,7 @@ export class WebviewManager {
     },
     shouldUpdateGcpConfigProperties = true
   ) => {
-    const message = `GCP config switched successfully to [${gcpConfig.name}]`;
+    const message = INFO_MESSAGE.CONFIG_SWITCHED(gcpConfig.name);
 
     try {
       await activateConfig(gcpConfig.name);
@@ -263,6 +263,7 @@ export class WebviewManager {
       updateJsonFile(ADC_FILE_PATH, gcpConfigADC);
       await this.updateWebviews();
       vscode.window.showInformationMessage(message);
+
       return;
     } catch (error: any) {
       vscode.window.showErrorMessage(error);
@@ -322,14 +323,16 @@ export class WebviewManager {
             );
 
             if (newGcpConfig) {
-              this.switchGcpConfig(context, webview, {
+              this.switchGcpConfig(context, {
                 name: gcpConfigForm.configName,
                 account: gcpConfigForm.account,
                 project: gcpConfigForm.project,
               });
             }
           } catch (error) {
-            vscode.window.showErrorMessage(`Error on submit form: ${error}`);
+            vscode.window.showErrorMessage(
+              ERROR_MESSAGE.CONFIG_CREATE_FAILED(error)
+            );
           }
 
           return;
