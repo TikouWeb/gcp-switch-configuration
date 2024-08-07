@@ -22,3 +22,21 @@ export const WEBVIEW_COMMAND = {
   create_config: "create_config",
   clear_adc_cache: "clear_adc_cache",
 };
+
+export const INFO_MESSAGE = {
+  CONFIG_SWITCHED: (gcpConfigName: string) =>
+    `GCP config switched successfully to [${gcpConfigName}]`,
+
+  CONFIG_DELETE_CONFIRM: (gcpConfigName: string) =>
+    `Are you sure you want to delete \n [${gcpConfigName}] ?`,
+
+  CONFIG_DELETED: (gcpConfigName: string) =>
+    `Successfully deleted configuration: [${gcpConfigName}]`,
+};
+
+export const ERROR_MESSAGE = {
+  CONFIG_DELETE_FAILED: (gcpConfigName: string) =>
+    `Can not delete [${gcpConfigName}] because is set as active. Switch to another configuration and retry`,
+
+  CONFIG_CREATE_FAILED: (error: any) => `Error on submit form: ${error}`,
+};

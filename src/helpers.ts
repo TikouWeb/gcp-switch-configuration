@@ -43,16 +43,7 @@ export const createWebViewPanel = (
   const panel = vscode.window.createWebviewPanel(
     APP_NAME,
     "GCP Switch Config",
-    viewColumn,
-    {
-      enableScripts: true,
-      retainContextWhenHidden: true,
-      enableCommandUris: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(context.extensionUri, "assets"),
-        vscode.Uri.joinPath(context.extensionUri, "node_modules"),
-      ],
-    }
+    viewColumn
   );
 
   const iconPath = vscode.Uri.joinPath(
