@@ -14,7 +14,12 @@ import {
   refreshGcpProjects,
 } from "../global-cache";
 
-import { updateJsonFile, createWebViewPanel, openADCFile } from "../helpers";
+import {
+  updateJsonFile,
+  createWebViewPanel,
+  openADCFile,
+  getWebviewOptions,
+} from "../helpers";
 
 import {
   setGcpConfigADC,
@@ -36,26 +41,18 @@ export class WebviewManager {
   private panel: vscode.WebviewPanel | undefined;
   private view: vscode.WebviewView | undefined;
   private context: vscode.ExtensionContext;
-  private webviewOptions: vscode.WebviewOptions;
   private gcpConfigStatusBarItem: GcpConfigStatusBarItemManager;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.webviewOptions = {
-      enableScripts: true,
-      enableCommandUris: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, "assets"),
-        vscode.Uri.joinPath(this.context.extensionUri, "node_modules"),
-      ],
-    };
+
     this.gcpConfigStatusBarItem =
       GcpConfigStatusBarItemManager.getInstance(context);
   }
 
   setPanelView(panel: vscode.WebviewPanel) {
     this.panel = panel;
-    this.panel.webview.options = this.webviewOptions;
+    this.panel.webview.options = getWebviewOptions(this.context);
     this.panel.onDidDispose(() => {
       this.panel = undefined;
     });
@@ -64,17 +61,8 @@ export class WebviewManager {
 
   setActivityBarView(view: vscode.WebviewView) {
     this.view = view;
-    this.view.webview.options = this.webviewOptions;
+    this.view.webview.options = getWebviewOptions(this.context);
     this.renderDashboardWebview(this.context, this.view.webview);
-  }
-
-  setOptions() {
-    if (this.panel) {
-      this.panel.webview.options = this.webviewOptions;
-    }
-    if (this.view) {
-      this.view.webview.options = this.webviewOptions;
-    }
   }
 
   updateWebviews = async () => {

@@ -5,12 +5,17 @@ All notable changes to the "gcp-switch-configuration" extension will be document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.7] - 2024-08-30
+
+### Fixed
+
+- Fix configuration form Add/Edit
+
 ## [2.2.6] - 2024-08-012
 
 ### Fixed
 
-- update dependency (from github dependabot) 
-
+- update dependency (from github dependabot)
 
 ## [2.2.5] - 2024-08-07
 

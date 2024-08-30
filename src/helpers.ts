@@ -53,6 +53,7 @@ export const createWebViewPanel = (
   );
 
   panel.iconPath = { dark: iconPath, light: iconPath };
+  panel.webview.options = getWebviewOptions(context);
 
   return panel;
 };
@@ -60,4 +61,15 @@ export const createWebViewPanel = (
 export const openADCFile = () => {
   const uri = vscode.Uri.parse(createOsAbsolutePath(ADC_FILE_PATH));
   vscode.window.showTextDocument(uri);
+};
+
+export const getWebviewOptions = (context: vscode.ExtensionContext) => {
+  return {
+    enableScripts: true,
+    enableCommandUris: true,
+    localResourceRoots: [
+      vscode.Uri.joinPath(context.extensionUri, "assets"),
+      vscode.Uri.joinPath(context.extensionUri, "node_modules"),
+    ],
+  };
 };

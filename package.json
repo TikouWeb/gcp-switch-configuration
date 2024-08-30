@@ -2,7 +2,7 @@
   "name": "gcp-switch-config",
   "displayName": "GCP Switch Configuration",
   "description": "Switch gcp configuration with one click just like magic ✨",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "private": false,
   "repository": {
     "type": "git",
@@ -72,7 +72,8 @@
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
     "esbuild": "yarn run esbuild-base -- --sourcemap",
     "esbuild-watch": "yarn run esbuild-base -- --sourcemap --watch",
-    "test-compile": "tsc -p ./"
+    "test-compile": "tsc -p ./",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
